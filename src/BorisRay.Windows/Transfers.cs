@@ -80,9 +80,9 @@ internal static class Transfers
         using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(15) };
         using var response = await client.GetAsync(UpdatesBase + "latest.json", HttpCompletionOption.ResponseHeadersRead, timeout.Token); response.EnsureSuccessStatusCode();
         var data = await ReadBoundedAsync(response.Content, 16_384, timeout.Token);
-        var manifest = JsonNode.Parse(data)!.AsObject();
-        var version = Version.Parse(manifest["version"]!.GetValue<string>());
-        var url = new Uri(manifest["url"]!.GetValue<string>());
+        var manifest = JsonNode.Parse(data) as JsonObject ?? throw new InvalidOperationException("Некорректный ответ сервера обновлений.");
+        if (!Version.TryParse(manifest["version"]?.GetValue<string>(), out var version) || !Uri.TryCreate(manifest["url"]?.GetValue<string>(), UriKind.Absolute, out var url))
+            throw new InvalidOperationException("Некорректный ответ сервера обновлений.");
         if (manifest["platform"]?.GetValue<string>() != "win-x64" || url.Scheme != "https" || url.Host != "fv1.borishub.com" || !url.IsDefaultPort || url.UserInfo.Length > 0 || url.Query.Length > 0 || url.Fragment.Length > 0 ||
             !System.Text.RegularExpressions.Regex.IsMatch(url.AbsolutePath, @"^/downloads/borisray/windows/BorisRay-Windows-x64-[0-9.]+\.zip$"))
             throw new InvalidOperationException("Некорректный ответ сервера обновлений.");

@@ -69,6 +69,9 @@ internal static class Capture
                     input.Text = "https://provider.example/subscription/synthetic"; Snap(modal, "import-dialog"); modal.Close();
                 };
                 modalTimer.Start(); Descendants(window).OfType<Button>().Single(b => b.Text == "Заменить подписку…").PerformClick();
+                using var ruleTimer = new System.Windows.Forms.Timer { Interval = 150 };
+                ruleTimer.Tick += (_, _) => { ruleTimer.Stop(); var modal = Application.OpenForms.Cast<Form>().Single(f => f.Text == "Маршрут приложения"); Snap(modal, "app-rule-dialog"); modal.Close(); };
+                ruleTimer.Start(); window.AddAppPath(Application.ExecutablePath);
                 Finish(window);
             }
             using (var empty = new MainWindow(new PrivateStore(Path.Combine(temporary, "empty")), captureOnly: true))

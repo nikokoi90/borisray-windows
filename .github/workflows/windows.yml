@@ -2,6 +2,7 @@ name: Windows build and native checks
 on:
   push:
     branches: [main, 'codex/**']
+    paths: ['src/**', 'tests/**', 'assets/**', 'licenses/**', 'Scripts/build.ps1', '.github/workflows/**', 'README.txt', 'LICENSE', 'LICENSES.txt']
   workflow_dispatch:
 permissions:
   contents: read

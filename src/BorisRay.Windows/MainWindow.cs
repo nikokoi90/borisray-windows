@@ -53,6 +53,7 @@ internal sealed class MainWindow : Form
         var center = new Panel { Dock = DockStyle.Fill }; center.Controls.Add(content); center.Controls.Add(banner);
         Controls.Add(center); Controls.Add(sidebar);
         content.SizeChanged += (_, _) => AdaptContent();
+        content.Layout += (_, _) => AdaptContent(); SizeChanged += (_, _) => AdaptContent();
         timer.Tick += async (_, _) => await PollAsync(); timer.Start();
         FormClosing += ClosingAsync; Shown += (_, _) => { var dark = 1; DwmSetWindowAttribute(Handle, 20, ref dark, sizeof(int)); };
         ShowPage(page);
@@ -95,7 +96,8 @@ internal sealed class MainWindow : Form
         try
         {
             panel.SuspendLayout();
-            var available = Math.Max(240, content.ClientSize.Width - panel.Padding.Horizontal - 8);
+            var viewport = Math.Min(content.ClientSize.Width, Math.Max(240, Width - 232 - SystemInformation.FrameBorderSize.Width * 2 - 16));
+            var available = Math.Max(240, viewport - panel.Padding.Horizontal - 8);
             void Fit(Control child, int width)
             {
                 if (child is Label) child.MaximumSize = new Size(width, 0);
@@ -158,7 +160,7 @@ internal sealed class MainWindow : Form
         apply = Button("Применить маршруты", () => _ = RunAsync(async () => { await engine.StopAsync(); await StartAsync(); }));
         panel.Controls.Add(Row(connect, statusLabel, apply));
         pendingLabel = Label("", secondary: true); panel.Controls.Add(pendingLabel);
-        panel.Controls.Add(Label(store.Nodes.Count == 0 ? "Добавь свою подписку" : $"Подписка · {store.Nodes.Count} серверов", 14, true));
+        panel.Controls.Add(Label(store.Nodes.Count == 0 ? "Добавь свою подписку" : $"Профилей в подписке: {store.Nodes.Count}", 14, true));
         import = Button(store.Nodes.Count == 0 ? "Добавить по ссылке…" : "Заменить подписку…", ImportProfile, store.Nodes.Count == 0);
         refresh = Button("Обновить", () => _ = RunAsync(RefreshProfileAsync));
         panel.Controls.Add(Row(import, Button("Из файла…", ImportFile), refresh));
@@ -169,12 +171,14 @@ internal sealed class MainWindow : Form
         var country = Combo(countryValues, countries.GetValueOrDefault(store.Settings.Country, "Все страны"), value => { store.Settings.Country = countries.First(x => x.Value == value).Key; store.Settings.Server = "auto"; Changed(); ShowPage(page); }, 270);
         var channel = Combo(["Авто · TCP + UDP", "TCP · VLESS Reality", "UDP · Hysteria2"], store.Settings.Channel switch { "tcp" => "TCP · VLESS Reality", "udp" => "UDP · Hysteria2", _ => "Авто · TCP + UDP" }, value => { store.Settings.Channel = value.StartsWith("TCP", StringComparison.Ordinal) ? "tcp" : value.StartsWith("UDP", StringComparison.Ordinal) ? "udp" : "all"; store.Settings.Server = "auto"; Changed(); ShowPage(page); }, 270);
         panel.Controls.Add(Row(Field("Страна", country), Field("Канал", channel)));
-        var nodes = Configuration.Selected(store.Nodes, store.Settings); var choices = new[] { "Автовыбор · по доступности и задержке" }.Concat(nodes.Select(n => n.Tag)).ToList();
+        var nodes = Configuration.Selected(store.Nodes, store.Settings);
+        if (store.Nodes.Count > 0 && nodes.Count == 0) panel.Controls.Add(Label("В этой стране нет профиля выбранного канала. Выбери другой канал или «Все страны».", secondary: true));
+        var choices = new[] { "Автовыбор · по доступности и задержке" }.Concat(nodes.Select(n => n.Tag)).ToList();
         panel.Controls.Add(Field("Сервер", Combo(choices, choices.Contains(store.Settings.Server, StringComparer.Ordinal) ? store.Settings.Server : choices[0], value => { store.Settings.Server = value == choices[0] ? "auto" : value; Changed(); }, 590)));
         panel.Controls.Add(Field("Остальной трафик", Combo(["Через VPN", "Напрямую"], store.Settings.DefaultVpn ? "Через VPN" : "Напрямую", value => { store.Settings.DefaultVpn = value == "Через VPN"; Changed(); }, 270)));
         panel.Controls.Add(Row(Button($"Приложения · {store.Settings.Apps.Count}", () => ShowPage("Приложения")), Button($"Сайты · {store.Settings.Sites.Count}", () => ShowPage("Сайты"))));
         panel.Controls.Add(Label("Правила сайтов имеют приоритет, затем применяются правила приложений и общий маршрут.", secondary: true));
-        speed = Button("Измерить", Measure); panel.Controls.Add(Row(Label("Скорость и пинг", 14, true), speed));
+        speed = Button("Измерить", Measure); var speedHeading = Label("Скорость и пинг", 14, true); speedHeading.Padding = new Padding(0, 8, 12, 0); panel.Controls.Add(Row(speedHeading, speed));
         speedLabel = Label(speedText); panel.Controls.Add(speedLabel);
         trafficLabel = Label("Получено: 0 Б · отправлено: 0 Б", secondary: true); panel.Controls.Add(trafficLabel);
         panel.Controls.Add(Label("Замер через выбранный сервер: 5 МиБ загрузки, 1 МиБ отдачи. Пинг измеряется HTTPS-запросами.", secondary: true));
@@ -197,7 +201,7 @@ internal sealed class MainWindow : Form
     private void ImportProfile()
     {
         using var dialog = new Form { Text = "Импорт подписки", Size = new Size(620, 260), StartPosition = FormStartPosition.CenterParent, BackColor = Ground, ForeColor = TextColor, Font = Font, MinimizeBox = false, MaximizeBox = false };
-        var explanation = Label("HTTPS-ссылка от твоего провайдера или один VLESS Reality / Hysteria2-профиль. Новая подписка заменит текущую; правила сохранятся."); explanation.Dock = DockStyle.Top; explanation.Padding = new Padding(16);
+        var explanation = Label("HTTPS-ссылка от твоего провайдера или один VLESS Reality / Hysteria2-профиль. Новая подписка заменит текущую; правила сохранятся."); explanation.MaximumSize = new Size(dialog.ClientSize.Width - 16, 0); explanation.Dock = DockStyle.Top; explanation.Padding = new Padding(16);
         var input = new TextBox { Dock = DockStyle.Top, UseSystemPasswordChar = true, MaxLength = Profiles.MaximumBytes, BackColor = Input, ForeColor = TextColor, AccessibleName = "Приватная ссылка подписки" };
         var show = new CheckBox { Text = "Показать ссылку", Dock = DockStyle.Top, AutoSize = true, Padding = new Padding(16, 8, 0, 8) }; show.CheckedChanged += (_, _) => input.UseSystemPasswordChar = !show.Checked;
         var buttons = Row(Button("Добавить", () => { dialog.DialogResult = DialogResult.OK; dialog.Close(); }, true), Button("Отмена", () => dialog.Close())); buttons.Dock = DockStyle.Bottom;
@@ -217,7 +221,7 @@ internal sealed class MainWindow : Form
         grid.DefaultCellStyle = new DataGridViewCellStyle { BackColor = Ground, ForeColor = TextColor, SelectionBackColor = Color.FromArgb(65, 52, 38), SelectionForeColor = TextColor, Padding = new Padding(4), Font = Font };
         grid.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { BackColor = PanelColor, ForeColor = TextColor, Font = new Font(Font, FontStyle.Bold) };
         grid.RowTemplate.Height = 40; grid.ColumnHeadersHeight = 36; grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing; grid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-        foreach (var heading in headings) grid.Columns.Add(heading, heading);
+        foreach (var heading in headings) { var index = grid.Columns.Add(heading, heading); grid.Columns[index].SortMode = DataGridViewColumnSortMode.NotSortable; }
         grid.DataError += (_, e) => { e.ThrowException = false; };
         return grid;
     }
@@ -228,7 +232,8 @@ internal sealed class MainWindow : Form
         var grid = Grid("Приложение", "Путь", "Маршрут", "Папка"); grid.Height = 300; grid.Columns[0].ReadOnly = grid.Columns[1].ReadOnly = true;
         grid.Columns.RemoveAt(3); grid.Columns.Insert(3, new DataGridViewCheckBoxColumn { HeaderText = "Подпапки", Name = "Папка", FlatStyle = FlatStyle.Flat, FillWeight = 55 });
         grid.Columns.RemoveAt(2); grid.Columns.Insert(2, new DataGridViewComboBoxColumn { HeaderText = "Маршрут", Name = "Маршрут", DataSource = new[] { "Через VPN", "Напрямую" }, FlatStyle = FlatStyle.Flat, FillWeight = 85 });
-        grid.Columns[1].FillWeight = 160;
+        grid.Columns[0].FillWeight = 90; grid.Columns[0].MinimumWidth = 90; grid.Columns[1].FillWeight = 170; grid.Columns[1].MinimumWidth = 150; grid.Columns[2].MinimumWidth = 115; grid.Columns[3].FillWeight = 85; grid.Columns[3].MinimumWidth = 95;
+        foreach (DataGridViewColumn column in grid.Columns) column.SortMode = DataGridViewColumnSortMode.NotSortable;
         foreach (var rule in store.Settings.Apps) { var i = grid.Rows.Add(Path.GetFileName(rule.Path), rule.Path, rule.Vpn ? "Через VPN" : "Напрямую", rule.IncludeFolder); grid.Rows[i].Tag = rule; }
         var pathLabel = new TextBox { Multiline = true, ReadOnly = true, Width = 780, Height = 54, BackColor = Input, ForeColor = TextColor, ScrollBars = ScrollBars.Vertical, AccessibleName = "Полный путь выбранного приложения" };
         void Selection() { pathLabel.Text = grid.SelectedRows.Count > 0 && grid.SelectedRows[0].Tag is AppRule rule ? rule.Path : "Выбери приложение, чтобы увидеть полный путь."; }
@@ -251,14 +256,14 @@ internal sealed class MainWindow : Form
         using var picker = new OpenFileDialog { Title = "Приложение или ярлык", Filter = "Приложения и ярлыки|*.exe;*.lnk;*.url|Все файлы|*.*", CheckFileExists = true };
         if (picker.ShowDialog(this) == DialogResult.OK) AddAppPath(picker.FileName);
     }
-    private void AddAppPath(string input)
+    internal void AddAppPath(string input)
     {
         try
         {
             var path = WindowsPlatform.ResolveExecutable(input);
             using var dialog = new Form { Text = "Маршрут приложения", Size = new Size(620, 270), StartPosition = FormStartPosition.CenterParent, BackColor = Ground, ForeColor = TextColor, Font = Font, MinimizeBox = false, MaximizeBox = false };
-            var body = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(18) };
-            body.Controls.Add(Label(Path.GetFileName(path), 13, true)); body.Controls.Add(Label(path, secondary: true));
+            var body = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = true, Padding = new Padding(18) };
+            body.Controls.Add(Label(Path.GetFileName(path), 13, true)); var fullPath = Label(path, secondary: true); fullPath.MaximumSize = new Size(dialog.ClientSize.Width - 36, 0); body.Controls.Add(fullPath);
             var folder = new CheckBox { Text = "Также .exe в этой папке и её подпапках", AutoSize = true, Margin = new Padding(0, 0, 0, 12) }; body.Controls.Add(folder);
             bool vpn = false; body.Controls.Add(Row(Button("Напрямую", () => { dialog.DialogResult = DialogResult.OK; dialog.Close(); }, true), Button("Через VPN", () => { vpn = true; dialog.DialogResult = DialogResult.OK; dialog.Close(); }), Button("Отмена", () => dialog.Close()))); dialog.Controls.Add(body);
             if (dialog.ShowDialog(this) != DialogResult.OK) return;
@@ -274,7 +279,7 @@ internal sealed class MainWindow : Form
         var paths = new List<string>();
         foreach (var process in Process.GetProcesses()) using (process) { try { var path = process.MainModule?.FileName; if (path != null && path.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && !paths.Contains(path, StringComparer.OrdinalIgnoreCase)) paths.Add(path); } catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException or NotSupportedException) { } }
         foreach (var path in paths.OrderBy(Path.GetFileName)) list.Items.Add(path);
-        var pick = Button("Выбрать .exe", () => { if (list.SelectedItem != null) { dialog.DialogResult = DialogResult.OK; dialog.Close(); } }); pick.Dock = DockStyle.Bottom; dialog.Controls.Add(list); dialog.Controls.Add(pick);
+        var pick = Button("Выбрать .exe", () => { if (list.SelectedItem != null) { dialog.DialogResult = DialogResult.OK; dialog.Close(); } }); pick.Enabled = false; list.SelectedIndexChanged += (_, _) => pick.Enabled = list.SelectedItem != null; pick.Dock = DockStyle.Bottom; dialog.AcceptButton = pick; dialog.Controls.Add(list); dialog.Controls.Add(pick);
         if (dialog.ShowDialog(this) == DialogResult.OK && list.SelectedItem is string selected) AddAppPath(selected);
     }
     private void SitesPage()
@@ -294,7 +299,10 @@ internal sealed class MainWindow : Form
     private void ConnectionsPage()
     {
         var panel = Screen("Соединения"); connectionsStatus = Label(engine.Running ? "Получаю соединения…" : "VPN выключен. Активных соединений нет.", secondary: true); panel.Controls.Add(connectionsStatus);
-        connections = Grid("Процесс", "Сайт / IP", "Сеть", "Маршрут", "Получено", "Отправлено"); connections.ReadOnly = true; connections.Height = 300; panel.Controls.Add(connections);
+        connections = Grid("Процесс", "Сайт / IP", "Сеть", "Маршрут", "Получено", "Отправлено"); connections.ReadOnly = true; connections.Height = 300;
+        var weights = new[] { 80f, 125f, 55f, 90f, 90f, 90f }; var minimums = new[] { 80, 90, 50, 75, 90, 90 };
+        for (var index = 0; index < 6; index++) { connections.Columns[index].FillWeight = weights[index]; connections.Columns[index].MinimumWidth = minimums[index]; }
+        panel.Controls.Add(connections);
         var detail = new TextBox { Multiline = true, ReadOnly = true, Width = 780, Height = 100, BackColor = Input, ForeColor = TextColor, ScrollBars = ScrollBars.Vertical, AccessibleName = "Подробности выбранного соединения" };
         connections.SelectionChanged += (_, _) => { if (connections.SelectedRows.Count > 0 && connections.SelectedRows[0].Tag is JsonObject row) detail.Text = Details(row); }; panel.Controls.Add(detail);
         panel.Controls.Add(Label("Обновляется раз в две секунды. Очень короткие соединения могут не попасть в таблицу. «Напрямую» означает выход через провайдера; правило выполняется внутри локального туннеля.", secondary: true)); RenderConnections();
@@ -330,7 +338,7 @@ internal sealed class MainWindow : Form
         panel.Controls.Add(Button("Исходники BorisRay", () => OpenUrl(Transfers.UpdatesBase + "BorisRay-Windows-0.1.0-source.zip")));
         panel.Controls.Add(Button("Лицензии и авторы", () => OpenFile(Path.Combine(AppContext.BaseDirectory, "LICENSES.txt"))));
         panel.Controls.Add(Button("Сохранить диагностику…", SaveDiagnostics));
-        panel.Controls.Add(Label("Ядро sing-box 1.14.3, © nekohasekai и участники SagerNet, GPLv3+. Независимый клиент, без связи с авторами исходного проекта. Подпись издателя Windows для этой персональной сборки не выпускалась.", secondary: true));
+        panel.Controls.Add(Label("Ядро sing-box 1.14.3, © nekohasekai и участники SagerNet, GPLv3+. Независимый клиент, без связи с авторами исходного проекта. Подпись издателя Windows для этой сборки не выпускалась.", secondary: true));
     }
     private static void OpenUrl(string url) => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     private static void OpenFile(string path) => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
