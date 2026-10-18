@@ -361,7 +361,7 @@ internal sealed class MainWindow : Form
         panel.Controls.Add(Label("Свои HTTPS-подписки, списки ссылок и Base64, Xray/sing-box JSON и Clash YAML. Протоколы: VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC и SOCKS5. Для VLESS/VMess/Trojan: TCP, WebSocket, gRPC, HTTP/HTTPUpgrade. XHTTP, зашифрованные ссылки Happ и внешние плагины пока не поддерживаются.", secondary: true));
         panel.Controls.Add(Label("Подписка хранится на этом компьютере и шифруется средствами Windows. Клиент не содержит готовых доступов к VPN-сервису.", secondary: true));
         panel.Controls.Add(Label("Обновления BorisRay", 14, true));
-        var updateStatus = Label("Проверка доступна вручную. Новая версия устанавливается распаковкой архива после закрытия приложения.", secondary: true); panel.Controls.Add(updateStatus);
+        var updateStatus = Label("Проверь обновления, скачай установщик, отключи VPN и закрой BorisRay. Запусти установщик — подписка и правила сохранятся.", secondary: true); panel.Controls.Add(updateStatus);
         panel.Controls.Add(Button("Проверить обновления", () => _ = RunAsync(async () => { var update = await Transfers.UpdateAsync(); if (update.Version <= new Version(0, 2, 0)) updateStatus.Text = "Установлена последняя версия"; else { updateStatus.Text = "Доступна версия " + update.Version; panel.Controls.Add(Button("Скачать обновление", () => OpenUrl(update.Download.AbsoluteUri), true)); } })));
         panel.Controls.Add(Button("Исходники BorisRay", () => OpenUrl(Transfers.UpdatesBase + "BorisRay-Windows-0.2.0-source.zip")));
         panel.Controls.Add(Button("Лицензии и авторы", () => OpenFile(Path.Combine(AppContext.BaseDirectory, "LICENSES.txt"))));
