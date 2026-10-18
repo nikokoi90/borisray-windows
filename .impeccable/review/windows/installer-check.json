@@ -1,0 +1,9 @@
+{
+  "installedFileHashes": "passed",
+  "localDataPreservation": "passed",
+  "startMenuShortcut": "passed",
+  "install": "passed",
+  "os": "Microsoft Windows 10.0.26100",
+  "vpnStarted": false,
+  "uninstall": "passed"
+}

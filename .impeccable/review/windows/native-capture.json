@@ -14,14 +14,14 @@
       "name": "connection-desktop",
       "Width": 1044,
       "Height": 788,
-      "sampledColors": 119,
+      "sampledColors": 127,
       "dpi": 96
     },
     {
       "name": "connection-compact",
       "Width": 946,
       "Height": 679,
-      "sampledColors": 116,
+      "sampledColors": 119,
       "dpi": 96
     },
     {
@@ -70,21 +70,21 @@
       "name": "about-desktop",
       "Width": 1044,
       "Height": 788,
-      "sampledColors": 132,
+      "sampledColors": 136,
       "dpi": 96
     },
     {
       "name": "about-compact",
       "Width": 946,
       "Height": 679,
-      "sampledColors": 136,
+      "sampledColors": 139,
       "dpi": 96
     },
     {
       "name": "connection-keyboard",
       "Width": 1044,
       "Height": 788,
-      "sampledColors": 119,
+      "sampledColors": 127,
       "dpi": 96
     },
     {
@@ -131,9 +131,16 @@
     },
     {
       "name": "import-dialog",
-      "Width": 620,
-      "Height": 260,
-      "sampledColors": 45,
+      "Width": 660,
+      "Height": 390,
+      "sampledColors": 66,
+      "dpi": 96
+    },
+    {
+      "name": "import-error",
+      "Width": 660,
+      "Height": 390,
+      "sampledColors": 78,
       "dpi": 96
     },
     {
@@ -147,7 +154,7 @@
       "name": "connection-empty",
       "Width": 1044,
       "Height": 788,
-      "sampledColors": 127,
+      "sampledColors": 128,
       "dpi": 96
     }
   ]

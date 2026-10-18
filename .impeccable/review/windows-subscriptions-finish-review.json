@@ -1,0 +1,114 @@
+{
+  "disposition": "fix",
+  "inputs_note": "Original request and confirmed answers were supplied in the calling brief. No separate QUALITY BAR card or five-block seed contract was supplied; this ordinary extension uses the existing DESIGN.md, design.json and windows surface brief as its inherited authority. No comp-led build or new concept roll is represented. No native Windows detector exists and no web detector ran. All provided primary source files were sampled; the parser was not exhaustively audited.",
+  "persistence": {
+    "status": "pass",
+    "evidence": {
+      "required_captures": 21,
+      "inspected_captures": 21,
+      "result": "All names in windows/native-capture.json have valid, nonblank PNGs with matching dimensions and content. Desktop 1044x788, compact 946x679, import 660x390 and app-rule dialog 620x270 are plausible native viewports. Compact views intentionally scroll; no required capture fails check 0.",
+      "capture_scope": "Actual WinForms DrawToBitmap on Windows Server 2025 CI at 96 DPI with synthetic fixtures. Running-pending fixtures are explicitly simulated and do not prove a working tunnel.",
+      "build_commit": "e41c0e2fb99e4ebabd689cc7dd36ecd9944c2d6e",
+      "ci": "Saved ci.json reports successful run 39165213383, 75 portable checks and 24 Windows sing-box configuration checks; this review did not query CI over the network.",
+      "installer": "Saved installer-check.json reports installation, uninstallation, Start menu shortcut, installed-file hashes and preservation of local user data passed. No VPN was started.",
+      "artifact_hashes_verified_locally": {
+        "BorisRay-Windows-Setup-x64-0.2.0.exe": "589b76506b414dc824924102851b6a55c2aed6d7cb6f774b413119c423fad9fc",
+        "BorisRay-Windows-x64-0.2.0.zip": "b4e5eee2608e458fef5068491b69711c577625c8f24eb7dec6a8c20e20af19e7"
+      }
+    },
+    "specifics": [
+      "PRODUCT.md exists and names Windows 11 Intel/AMD x64, free provider-neutral use and the standard Windows installer.",
+      "Existing DESIGN.md and .impeccable/design.json describe the inherited gold manta, Georgia wordmark, charcoal work area and native utility controls seen in the captures. Their older baseline revision/capture count is historical documentation, not evidence for this candidate.",
+      "No comp, reproduction diff, comp approval or build-state gate applies to this ordinary extension of the existing world.",
+      "Physical Windows 11 routing, live provider-network interoperability and high-DPI appearance remain unverified."
+    ]
+  },
+  "fidelity": {
+    "status": "fail",
+    "matrix": [
+      {
+        "element": "TYPE",
+        "state": "match",
+        "evidence": "The gold Georgia serif BorisRay wordmark retains the inherited brand character. Segoe UI headings and operating text follow DESIGN.md's native Windows typography; no new display voice is introduced."
+      },
+      {
+        "element": "MATERIAL",
+        "state": "match",
+        "evidence": "The dimensional gold manta remains a visible raster in the sidebar. Surrounding UI stays flat and tonal, with no imitation metal, bevel or illustration added."
+      },
+      {
+        "element": "GROUND",
+        "state": "match",
+        "evidence": "The visible near-black work field, darker charcoal sidebar, input charcoal and umber selection match the named inherited #101014/#19191E/#202024/#413426 palette in visual value and temperature. Reviewer did not perform independent pixel sampling."
+      },
+      {
+        "element": "Navigation and first viewport",
+        "state": "match",
+        "evidence": "Persistent five-item sidebar; connection action and current state lead, followed by profile count/import actions, country/channel, server and default route. Connection and compact captures retain the same reading order."
+      },
+      {
+        "element": "Native compact composition",
+        "state": "adaptation",
+        "evidence": "Native controls, title bar, rectangular field chrome, tables and vertical scrolling use the Windows surface brief and DESIGN.md's resizable native layout. Offscreen lower content is reachable through the shown scrollbar; no overlapping or horizontally cut primary controls are visible."
+      },
+      {
+        "element": "Subscription empty and existing states",
+        "state": "match",
+        "evidence": "connection-empty.png gives import the gold primary treatment while Connect is disabled. Existing profiles use a clear replacement label and retain format/protocol summary. Provider access is not presented as bundled."
+      },
+      {
+        "element": "Private import and recoverable error",
+        "state": "match",
+        "evidence": "import-dialog.png masks input by default and provides an explicit disclosure checkbox. import-error.png retains the masked selected input and names unsupported transport plus supported alternatives and preservation of the current subscription. Source samples show bounded fetching, loading copy and parse/config validation before SaveProfile."
+      },
+      {
+        "element": "Saved-versus-applied route state",
+        "state": "match",
+        "evidence": "Offline pending captures say changes apply on next connection. Simulated running pending captures show saved/reconnect guidance and a visible Apply routes action on Applications and Sites."
+      },
+      {
+        "element": "Keyboard, empty and unknown states",
+        "state": "match",
+        "evidence": "connection-keyboard.png shows a dotted focus cue around the main action. Empty connections and unmeasured speed/latency remain explicitly empty or unknown. Synthetic fixtures are labeled in the parent window titles."
+      },
+      {
+        "element": "Installer delivery",
+        "state": "match",
+        "evidence": "A real local Setup x64 artifact exists with the build-record SHA. installer.iss installs under Program Files, creates Start menu/optional desktop entries, allows normal uninstall and leaves LocalAppData outside its installed-file set."
+      },
+      {
+        "element": "About update instructions",
+        "state": "contradicted",
+        "evidence": "about-desktop.png and about-compact.png tell users to install a new version by unpacking an archive. MainWindow.cs:364 contains that copy, while Transfers.cs:84 prefers installer_url and the candidate's primary Windows distribution is Setup.exe. Following the visible instructions does not describe the delivered installer workflow."
+      }
+    ],
+    "contract_promises": {
+      "thesis_and_own_world": "Inherited free provider-neutral gold manta utility preserved; no new roll claimed.",
+      "story": "Import a private provider subscription, choose routes, connect and inspect state remains the visible operating sequence.",
+      "first_viewport": "Connection state and primary action remain memorable and immediately findable; empty state points directly to adding a subscription.",
+      "form": "Existing native flat utility geometry and five-item navigation preserved. No new FORM seed was required or corroborated for this extension.",
+      "truth_and_floor": "No invented commercial claims, decorative card scaffold, kicker, gradient text, glyph-icon system or fake physicality observed. Modal import protects a private subscription and replacement action. The stale update instruction is the material copy/truth exception."
+    }
+  },
+  "ceiling": {
+    "status": "reached within captured scope",
+    "specifics": [
+      "The inherited world's native devices are present: original raster identity, serif wordmark, tonal frame, restrained gold action, native editable tables, keyboard focus and explicit state feedback.",
+      "Additional ornament, layered shadows and decorative motion would conflict with the inherited flat utility direction; no unused required device was found.",
+      "Hover/pressed/loading visuals were not captured as separate frames; relevant state handling was sampled in source. Physical Windows 11 TUN/live-network and high-DPI acceptance are outside this evidence and remain open runtime validation."
+    ]
+  },
+  "material_fixes": [
+    {
+      "order": 1,
+      "priority": "P2",
+      "check": "5 Truth / 6 Floor: copy / standard Windows installer promise",
+      "file": "src/BorisRay.Windows/MainWindow.cs",
+      "line": 364,
+      "finding": "About instructs archive extraction even though updates can return a Windows Setup installer.",
+      "fix": "Replace the archive-only instruction with installer-aware copy: close BorisRay and run the downloaded Windows Setup to update; if portable ZIP updates remain available, describe their extraction separately or use wording that follows the selected package.",
+      "validation": "Recapture about-desktop.png and about-compact.png over the same paths, confirm truthful installer instructions remain readable at both widths, and return for scoring this fix."
+    }
+  ],
+  "keep": "Preserve the gold manta/serif wordmark, restrained charcoal native utility, private masked import with retained recoverable input, provider-neutral wording and explicit saved-versus-applied routing feedback."
+}

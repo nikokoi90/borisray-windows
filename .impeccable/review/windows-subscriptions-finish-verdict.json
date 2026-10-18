@@ -1,0 +1,29 @@
+{
+  "verdict": {
+    "fixes": [
+      {
+        "original_order": 1,
+        "status": "resolved",
+        "finding": "About update instructions contradicted the delivered Windows installer.",
+        "evidence": "Fresh about-desktop.png (1044x788) and about-compact.png (946x679) at the original paths both visibly instruct: check updates, download the installer, disconnect VPN, close BorisRay, run the installer; subscription and rules are retained. The complete instruction wraps readably at both sizes without overlapping its heading or action.",
+        "source": "src/BorisRay.Windows/MainWindow.cs:364",
+        "commit": "6a5b012bb09d95d8e68de5bd772b2a0350b3e6ba"
+      }
+    ],
+    "evidence_gate": "All 21 required PNGs were reopened at their original paths. They are nonblank, depict their named states, and match native-capture.json dimensions. No recapture condition found.",
+    "fix_regressions": [],
+    "saved_ci": "ci.json reports success for https://github.com/nikokoi90/borisray-windows/actions/runs/39165560755 with 75 portable checks and 24 Windows sing-box config checks. No live network query was made in this verdict pass.",
+    "local_artifact_hashes_verified": {
+      "BorisRay-Windows-Setup-x64-0.2.0.exe": "f48d6325209661b3c3bbb8b2aefaddfd718aaae7457a269b1619e3ad030b4618",
+      "BorisRay-Windows-x64-0.2.0.zip": "b1e56bf09307bfd0e4ffa0dcd8370a751fbe105202710183aa90278f22068253"
+    },
+    "installer_evidence": "Updated installer-check.json reports install, uninstall, Start menu shortcut, installed-file hashes and local-data preservation passed; vpnStarted is false."
+  },
+  "remaining": {
+    "scored_fixes": "clear",
+    "fix_regressions": "none observed",
+    "scope": "This ship covers the scored fixes, not the whole surface.",
+    "unverified": "Physical Windows 11 TUN/routing, live provider networking and high-DPI appearance remain untested. Native bitmap captures are 96-DPI synthetic fixtures; running-pending UI is simulated."
+  },
+  "disposition": "ship"
+}

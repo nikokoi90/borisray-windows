@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "role": "impeccable_documenter",
+  "status": "pass within ordinary-extension documentation scope",
+  "scope": "Compare the Windows subscription/import and installer extension with the incumbent gold manta system. Preserve DESIGN.md and its sidecar byte-for-byte; record existing drift without repairing or canonizing it.",
+  "written": [
+    ".impeccable/review/windows-subscriptions-documentation.json"
+  ],
+  "source": {
+    "revision": "6a5b012bb09d95d8e68de5bd772b2a0350b3e6ba",
+    "headVerifiedLocally": true,
+    "baselineSourceRevision": "28083d27d8815314b89bc42e1002ebbd5334e598",
+    "filesChecked": [
+      "src/BorisRay.Windows/MainWindow.cs",
+      "src/BorisRay.Windows/Program.cs",
+      "src/BorisRay.Windows/BorisRay.Windows.csproj",
+      "src/BorisRay.Windows/Transfers.cs",
+      "tests/BorisRay.Capture/Program.cs",
+      "Scripts/installer.iss",
+      "assets/PROVENANCE.md",
+      "PRODUCT.md",
+      ".impeccable/surfaces/windows.md",
+      "DESIGN.md",
+      ".impeccable/design.json"
+    ],
+    "skillFilesReadRelativeToSkillRoot": [
+      "SKILL.md",
+      "agents/impeccable_documenter.toml",
+      "reference/document.md",
+      "reference/craft-floor.md"
+    ],
+    "samplingBoundary": "Source comparison and selected native components, not an exhaustive subscription-parser or security audit. No application build or runtime checks were rerun in this documentation pass."
+  },
+  "preservedBaseline": {
+    "decision": "ordinary extension; no new world, system refresh or sidecar regeneration",
+    "files": [
+      {
+        "path": "DESIGN.md",
+        "expectedSha256": "85525a75e362db1d64bf0e5e934fae4c8024be402dffb67cfbc53e53275a0354",
+        "observedSha256": "85525a75e362db1d64bf0e5e934fae4c8024be402dffb67cfbc53e53275a0354",
+        "unchanged": true
+      },
+      {
+        "path": ".impeccable/design.json",
+        "expectedSha256": "7a4d13e8ee99ba16538cfa5cecdc1ca3c8aeaaeb7c0e81944bc862b73c8e5dc9",
+        "observedSha256": "7a4d13e8ee99ba16538cfa5cecdc1ca3c8aeaaeb7c0e81944bc862b73c8e5dc9",
+        "unchanged": true
+      }
+    ],
+    "nativePrimitivesComparison": "MainWindow.cs from its color declarations through Changed() is unchanged from baseline source except the footer version string. This covers native palette, typography, sidebar, spacing, wrapping, rounded action drawing and focus treatment. Program.cs and assets/borisray.png are byte-identical to baseline source.",
+    "validation": {
+      "frontmatter": "Ruby YAML parsing passed; allowed token groups and component properties checked; every component token reference resolved.",
+      "sectionOrder": "Eight canonical DESIGN.md headings in the required order.",
+      "sidecar": "JSON parsing, schemaVersion 2 and color/typography metadata alignment passed.",
+      "primitiveCounts": {
+        "colors": 11,
+        "typography": 7,
+        "rounded": 1,
+        "spacing": 7,
+        "components": 9
+      },
+      "panelSpecimenCount": 8,
+      "officialExternalSchemaValidatorRun": false
+    }
+  },
+  "systemSummary": [
+    "Palette: Manta Gold #F1C27D over #101014 ground, #19191E sidebar and #202024 controls; #F4F1EC text, #B7B7C0 secondary, #413426 selection and semantic error colors remain the native source values.",
+    "Type: Georgia bold 20pt wordmark; Segoe UI bold 23pt page title, 18pt status and 14pt section title, 10pt body/labels and 9pt footer. Existing local 16pt About and 13pt chooser headings do not establish new reusable roles.",
+    "Layout: persistent 232px sidebar, five navigation items, vertically stacked work area, native wrapping and vertical scrolling at the 96-DPI baseline; no card grid or mobile navigation variant.",
+    "Controls: 8px action corners, geometric power mark, native rectangular fields/tables, tonal depth, no custom shadows or timed entrance motion; dotted keyboard focus remains visible.",
+    "Named rules: Gold Anchor, Two Voices, Flat Utility and Saved Versus Applied remain applicable to the extension."
+  ],
+  "evidence": {
+    "capturesPersonallyInspected": [
+      ".impeccable/review/windows/connection-desktop.png",
+      ".impeccable/review/windows/connection-compact.png",
+      ".impeccable/review/windows/import-dialog.png",
+      ".impeccable/review/windows/import-error.png",
+      ".impeccable/review/windows/about-desktop.png",
+      ".impeccable/review/windows/about-compact.png",
+      ".impeccable/review/windows/connection-empty.png",
+      ".impeccable/review/windows/connection-keyboard.png",
+      ".impeccable/review/windows/app-rule-dialog.png",
+      ".impeccable/review/windows/apps-pending-running-compact.png",
+      ".impeccable/review/windows/sites-pending-running-compact.png"
+    ],
+    "packet": ".impeccable/review/windows/native-capture.json",
+    "packetCaptureCount": 21,
+    "pngIntegrity": "All 21 packet paths exist, contain PNG signatures and have IHDR dimensions matching native-capture.json. Eleven selected PNGs were decoded and personally inspected. Nonblank sampled-color results for all 21 are saved runner evidence, not an independently repeated full-packet pixel audit.",
+    "dimensions": {
+      "desktop": "1044x788",
+      "compact": "946x679",
+      "import": "660x390",
+      "appRuleDialog": "620x270"
+    },
+    "dpi": 96,
+    "method": "Actual WinForms MainWindow DrawToBitmap on the standard GitHub Windows runner, reported as Windows Server 2025 / Microsoft Windows 10.0.26100 with .NET 10.0.13. Isolated synthetic fixtures only; running-pending UI explicitly simulated; no VPN started.",
+    "fixtureCrossCheck": "tests/BorisRay.Capture/Program.cs instantiates the actual MainWindow with captureOnly true, sets desktop/compact sizes, captures masked import, submits a synthetic unsupported XHTTP profile and asserts retained input/current profile before import-error.png. It explicitly simulates pending running UI and checks native rule editing, DPAPI reload, protected staging, owned-child cleanup and shortcut resolution.",
+    "savedCi": {
+      "path": ".impeccable/review/windows/ci.json",
+      "run": "https://github.com/nikokoi90/borisray-windows/actions/runs/39165560755",
+      "commit": "6a5b012bb09d95d8e68de5bd772b2a0350b3e6ba",
+      "conclusion": "success",
+      "portableChecks": 75,
+      "coreConfigurations": 24,
+      "readOnlyLocalEvidence": true,
+      "liveCiQueryOrRerun": false
+    },
+    "build": ".impeccable/review/windows/build.json",
+    "artifactsVerifiedLocally": [
+      {
+        "basename": "BorisRay-Windows-Setup-x64-0.2.0.exe",
+        "bytes": 59789478,
+        "sha256": "f48d6325209661b3c3bbb8b2aefaddfd718aaae7457a269b1619e3ad030b4618",
+        "matchesBuildRecord": true,
+        "storedOutsideRepository": true
+      },
+      {
+        "basename": "BorisRay-Windows-x64-0.2.0.zip",
+        "bytes": 84893617,
+        "sha256": "b1e56bf09307bfd0e4ffa0dcd8370a751fbe105202710183aa90278f22068253",
+        "matchesBuildRecord": true,
+        "storedOutsideRepository": true
+      }
+    ],
+    "savedInstallerCheck": {
+      "path": ".impeccable/review/windows/installer-check.json",
+      "install": "passed",
+      "uninstall": "passed",
+      "startMenuShortcut": "passed",
+      "installedFileHashes": "passed",
+      "localDataPreservation": "passed",
+      "vpnStarted": false,
+      "rerunByDocumenter": false
+    },
+    "finishReview": ".impeccable/review/windows-subscriptions-finish-review.json",
+    "finishVerdict": ".impeccable/review/windows-subscriptions-finish-verdict.json",
+    "finishBoundary": "The initial review is historical evidence of the installer-copy finding and its older candidate. The current verdict scores that single finding resolved at source 6a5b012, reports no fix regressions and disposition ship at the scored-fix scope only. This documenter pass does not broaden that verdict."
+  },
+  "extensionComparison": [
+    {
+      "area": "Brand, palette, typography and form",
+      "status": "matches incumbent system",
+      "evidence": "Connection and About desktop/compact keep the gold manta, gold serif wordmark, charcoal tonal frame, warm text, native fields, selected umber navigation and restrained gold action. The unchanged primitive source is stronger than visual color approximation; no new imagery or reusable token was introduced."
+    },
+    {
+      "area": "Connection first viewport and compact behavior",
+      "status": "matches incumbent system",
+      "evidence": "Connection action/state lead, followed by subscription controls, country/channel, server and default route. The added format/protocol summary uses existing secondary text. Compact captures keep primary controls readable and show vertical scrolling for lower content. Empty state makes import primary and Connect disabled; the keyboard capture preserves the dotted focus cue."
+    },
+    {
+      "area": "Private import, loading and recoverable error",
+      "status": "ordinary component extension",
+      "evidence": "Import default/error captures use existing ground, input, action, body and soft-error values. The enlarged modal explains replacement while preserving client rules, masks the input and supplies an explicit disclosure checkbox. XHTTP failure leaves masked input present and explains supported alternatives/current-subscription preservation. MainWindow.cs:202-230 adds in-modal loading/error feedback and validates parsed nodes before SaveProfile; source retains app/site/default-route settings. Native confirm/cancel bindings remain present. Loading controls are source evidence because no dedicated loading screenshot was supplied."
+    },
+    {
+      "area": "About and real installer workflow",
+      "status": "scored copy fix corroborated",
+      "evidence": "MainWindow.cs:364 and both fresh About captures instruct checking updates, downloading the installer, disconnecting VPN, closing BorisRay and running Setup while retaining subscription/rules. The copy wraps readably at both widths. Transfers.cs:84 prefers installer_url. Scripts/installer.iss declares Program Files installation, Start menu and optional desktop shortcuts, normal uninstall and no LocalAppData deletion; saved installer checks corroborate the tested lifecycle."
+    },
+    {
+      "area": "Saved versus applied routes",
+      "status": "incumbent rule preserved",
+      "evidence": "Source still retains pending state until successful StartAsync. Inspected compact Applications/Sites running fixtures show saved/reconnect guidance plus Apply routes above the tables. Their title bars state that running UI is simulated without a network connection."
+    },
+    {
+      "area": "Provider-neutral capability copy",
+      "status": "consistent with extension brief within supplied evidence",
+      "evidence": "Import/About describe user-owned HTTPS subscriptions, plain/Base64 lists, Xray/sing-box JSON and Clash YAML and name VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC and SOCKS5. They keep unsupported XHTTP, encrypted Happ and external plugins explicit and do not promise bundled provider access. Saved parser/config checks establish bounded fixture coverage, not universal provider compatibility."
+    }
+  ],
+  "referenceAssets": {
+    "canonicalWindowsAsset": "assets/borisray.png",
+    "sha256": "334299fd5a3c01c12edf24b5a23e71acd7621e53f0023cda82615fb1de3fb50b",
+    "unchangedFromBaselineSource": true,
+    "inheritedReferenceInspected": "../../2026-10-17/lichny-borisa-split/Assets/boris-ray-icon.png",
+    "referenceComparison": "Both raster files were personally viewed and show the same inherited dimensional golden manta on the dark icon tile. They are different image files with different SHA256 values; no byte-equivalence or new image generation is claimed."
+  },
+  "existingDriftNotCanonizedOrRepaired": [
+    {
+      "path": "DESIGN.md:120 and .impeccable/design.json narrative.overview",
+      "observation": "The baseline still names source 28083d2 and 20 captures and says ci.json identifies that revision. The mutable evidence paths now hold the 6a5b012 / 21-capture extension packet. This is historical evidence-pointer drift; the durable visual rules still match.",
+      "action": "Preserved verbatim under the ordinary-extension boundary. Current evidence is recorded in this report instead."
+    },
+    {
+      "path": ".impeccable/design.json components[Selection Field].html",
+      "observation": "The portable specimen still shows TCP · VLESS Reality and UDP · Hysteria2; current native MainWindow.cs:173 uses the provider-neutral labels TCP and UDP. The specimen is not a current capability or Windows acceptance source.",
+      "action": "Reported as existing specimen-content drift, without changing sidecar or promoting those older labels into a reusable rule."
+    },
+    {
+      "path": "src/BorisRay.Windows/MainWindow.cs:291-296",
+      "observation": "The app-route chooser still has visible Cancel/native close controls but no explicit Escape CancelButton binding. The chooser source is unchanged from baseline source.",
+      "action": "Existing interaction limitation retained outside this documentation pass and the scored installer-copy fix."
+    },
+    {
+      "path": "src/BorisRay.Windows/Program.cs:14",
+      "observation": "The exceptional startup-failure dialog still asks the user to check archive extraction. Program.cs is byte-identical to baseline source. This older exception-path copy is separate from the corrected normal About/update workflow.",
+      "action": "Not treated as a design-system rule and not repaired unasked. No startup-failure rendering or installer repair-path acceptance is claimed."
+    },
+    {
+      "path": "PRODUCT.md:31 and assets/PROVENANCE.md",
+      "observation": "PRODUCT.md's ../2026-10-17/lichny-borisa-split reference does not resolve from this project root; the inherited asset was found at ../../2026-10-17/lichny-borisa-split/Assets/boris-ray-icon.png. The copied provenance text also names the original Mac filename/build script rather than this Windows embedded-asset path.",
+      "action": "Reference wording preserved. The current Windows asset and actually resolved inherited reference are identified here without changing product or provenance files."
+    }
+  ],
+  "toolingBoundary": {
+    "contextRun": true,
+    "contextObservations": "The shipped context tool has no Windows platform value, reports the native platform as unrecognized and does not map the windows surface brief to MainWindow.cs automatically. The named Windows brief was read directly. It also reports config-build-path-unset; no new concept/direction round applies to this ordinary extension.",
+    "action": "Report existing tooling/configuration limitations only. Do not relabel the native app as web, load iOS/Android guidance, invent a Windows vocabulary value, create configuration or repair context drift as a side effect.",
+    "nativeWindowsDetectorAvailable": false,
+    "htmlCssDetectorRun": false,
+    "sidecarInterpretation": "HTML/CSS specimens and synthesized tonal ramps are portable panel illustrations. Native C# controls and Windows evidence remain canonical; snippets are not implementation or native acceptance evidence."
+  },
+  "unverified": [
+    "Physical Windows 11 Intel/AMD x64 TUN, real reconnect and kernel application/domain routing.",
+    "Live provider HTTPS retrieval, server interoperability and actual network traffic, throughput or latency.",
+    "High-DPI appearance and real per-monitor transitions; source DPI setup alone is not visual acceptance.",
+    "Rendered hover/pressed/loading states and startup-failure recovery beyond the supplied native synthetic captures.",
+    "Publisher signing or broad release/security certification; About states that this build has no Windows publisher signature."
+  ],
+  "acceptanceBoundary": "Documentation and visual-system continuity pass for the supplied native extension evidence. The fresh finish verdict remains ship at its scored-fix scope only. No physical Windows 11/network/high-DPI acceptance, deployment or user acceptance is implied.",
+  "modificationBoundary": "Only this report was written. No app/source/design/sidecar/product changes, commits, network queries, VPN operations, Mac/Android changes, new imagery or memory writes."
+}

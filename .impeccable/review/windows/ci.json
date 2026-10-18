@@ -1,9 +1,9 @@
 {
-  "run": "https://github.com/nikokoi90/borisray-windows/actions/runs/39163702461",
-  "commit": "28083d27d8815314b89bc42e1002ebbd5334e598",
+  "run": "https://github.com/nikokoi90/borisray-windows/actions/runs/39165560755",
+  "commit": "6a5b012bb09d95d8e68de5bd772b2a0350b3e6ba",
   "conclusion": "success",
-  "core_configuration_checks": 4,
-  "portable_tests": 30,
-  "physical_Windows11_TUN_tested": false,
-  "running_pending_fixtures_simulated": true
+  "portableChecks": 75,
+  "coreConfigurations": 24,
+  "physicalWindows11Tun": "not tested",
+  "captureMode": "native WinForms DrawToBitmap, synthetic only; simulated running pending UI; no TUN"
 }

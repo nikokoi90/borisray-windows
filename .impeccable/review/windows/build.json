@@ -1,9 +1,12 @@
 {
-  "sha256": "c1b716b81bb21180efec1a8183510eac4a34be1913acdce14f081ecd849f4802",
-  "platform": "win-x64",
-  "version": "0.1.0",
-  "os": "Microsoft Windows 10.0.26100",
+  "installerSha256": "f48d6325209661b3c3bbb8b2aefaddfd718aaae7457a269b1619e3ad030b4618",
+  "installerSize": 59789478,
+  "size": 84893617,
   "core": "1.14.3",
-  "size": 84757656,
-  "commit": "28083d27d8815314b89bc42e1002ebbd5334e598"
+  "sha256": "b1e56bf09307bfd0e4ffa0dcd8370a751fbe105202710183aa90278f22068253",
+  "platform": "win-x64",
+  "installer": "BorisRay-Windows-Setup-x64-0.2.0.exe",
+  "commit": "6a5b012bb09d95d8e68de5bd772b2a0350b3e6ba",
+  "version": "0.2.0",
+  "os": "Microsoft Windows 10.0.26100"
 }

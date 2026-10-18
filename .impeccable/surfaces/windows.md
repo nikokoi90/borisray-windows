@@ -19,3 +19,5 @@ Real process-path/parent-folder rules; domains override app rules; shortcuts res
 Fresh finish review and documenter, preserving the inherited world; source-backed checks and a compiled Windows artifact. Native Windows visual/routing acceptance stays explicit if the host is unavailable.
 
 Signature interaction: one top connection action reflects real engine state; route edits persist immediately and show an explicit apply/reconnect prompt. Motion is limited to native input feedback and state updates, no decorative entrance sequence.
+
+Subscription extension, 2026-10-18: HTTPS from user-selected providers, plain/Base64 links, Xray/sing-box JSON and Clash YAML; explicit unsupported-protocol errors preserve input and prior profile. No provider DNS/routes/listeners are imported. Normal Windows Setup installs/removes files and shortcuts while preserving private user data. Native import default/error and compact Connection captures are required. Existing visual system remains binding.

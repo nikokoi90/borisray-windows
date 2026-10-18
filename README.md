@@ -36,4 +36,4 @@ Synthetic test subscription, actual Windows Forms capture from CI; no VPN starte
 
 ![BorisRay connection screen](.impeccable/review/windows/connection-desktop.png)
 
-[Windows build and native checks](https://github.com/nikokoi90/borisray-windows/actions/runs/39163702461). Full capture metadata and explicitly simulated pending-route states: `.impeccable/review/windows/`.
+[Windows build and native checks](https://github.com/nikokoi90/borisray-windows/actions/runs/39165560755). Full capture metadata and explicitly simulated pending-route states: `.impeccable/review/windows/`.
