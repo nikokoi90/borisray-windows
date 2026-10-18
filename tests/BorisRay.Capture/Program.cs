@@ -1,5 +1,7 @@
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text.Json;
 using BorisRay.Core;
 using BorisRay.Windows;
@@ -23,6 +25,26 @@ internal static class Capture
             // Exercise DPAPI persistence in the same Windows identity, never a real user subscription.
             var reopened = new PrivateStore(fixture.Root);
             if (reopened.Nodes.Count != 2 || reopened.Settings.Apps.Count != 1) throw new Exception("DPAPI/settings reload failed");
+            // Real privileged staging + JobObject child validation, without starting TUN.
+            var owned = new CoreProcess(fixture.Root);
+            var work = owned.WorkDirectory;
+            try
+            {
+                var acl = new DirectoryInfo(work).GetAccessControl();
+                if (!acl.AreAccessRulesProtected) throw new Exception("Session ACL is inherited");
+                var allowed = new[] { new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null) };
+                foreach (FileSystemAccessRule rule in acl.GetAccessRules(true, true, typeof(SecurityIdentifier)))
+                    if (rule.AccessControlType == AccessControlType.Allow && !allowed.Contains(rule.IdentityReference)) throw new Exception("Unexpected principal in session ACL");
+                Wait(owned.ValidateAsync(reopened.Nodes, reopened.Settings));
+            }
+            finally { Wait(owned.DisposeAsync().AsTask()); }
+            if (Directory.Exists(work)) throw new Exception("Owned session folder survived disposal");
+            var shellType = Type.GetTypeFromProgID("WScript.Shell") ?? throw new Exception("WScript unavailable");
+            dynamic shell = Activator.CreateInstance(shellType)!;
+            var shortcut = Path.Combine(fixture.Root, "fixture.lnk");
+            try { dynamic link = shell.CreateShortcut(shortcut); try { link.TargetPath = Application.ExecutablePath; link.Save(); } finally { Marshal.FinalReleaseComObject(link); } }
+            finally { Marshal.FinalReleaseComObject(shell); }
+            if (!WindowsPlatform.ResolveExecutable(shortcut).Equals(Application.ExecutablePath, StringComparison.OrdinalIgnoreCase)) throw new Exception("Shortcut did not resolve to executable");
             using (var window = new MainWindow(reopened, captureOnly: true))
             {
                 window.Show(); Application.DoEvents();
@@ -39,7 +61,7 @@ internal static class Capture
             {
                 os = RuntimeInformation.OSDescription, runtime = RuntimeInformation.FrameworkDescription,
                 method = "Native Windows Forms DrawToBitmap on standard GitHub Windows runner; synthetic fixtures; no VPN started",
-                dpapiReload = "passed", captures
+                dpapiReload = "passed", protectedSessionAcl = "passed", ownedChildValidationAndCleanup = "passed", executableShortcut = "passed", captures
             }, new JsonSerializerOptions { WriteIndented = true }));
             Console.WriteLine("PASS native Windows Forms capture and isolated DPAPI round trip"); return 0;
         }
@@ -57,4 +79,6 @@ internal static class Capture
     }
     private static void Finish(MainWindow window)
     { window.Close(); var limit = DateTime.UtcNow.AddSeconds(10); while (!window.IsDisposed && DateTime.UtcNow < limit) { Application.DoEvents(); Thread.Sleep(10); } if (!window.IsDisposed) throw new Exception("Window failed to close"); }
+    private static void Wait(Task task)
+    { var limit = DateTime.UtcNow.AddSeconds(25); while (!task.IsCompleted && DateTime.UtcNow < limit) { Application.DoEvents(); Thread.Sleep(10); } if (!task.IsCompleted) throw new Exception("Native check timed out"); task.GetAwaiter().GetResult(); }
 }

@@ -19,6 +19,8 @@ internal sealed class MainWindow : Form
     private readonly System.Windows.Forms.Timer timer = new() { Interval = 2000 };
     private readonly List<Button> navigation = [];
     private readonly HashSet<Task> operations = [];
+    private readonly Dictionary<Control, int> preferredWidths = [];
+    private bool adapting;
     private string page = "Подключение";
     private bool busy, refreshing, dirty, closing, closed;
     private Label? statusLabel, pendingLabel, trafficLabel, speedLabel, connectionsStatus;
@@ -49,6 +51,7 @@ internal sealed class MainWindow : Form
         sidebar.Controls.Add(nav); sidebar.Controls.Add(brand); sidebar.Controls.Add(footer);
         var center = new Panel { Dock = DockStyle.Fill }; center.Controls.Add(content); center.Controls.Add(banner);
         Controls.Add(center); Controls.Add(sidebar);
+        content.SizeChanged += (_, _) => AdaptContent();
         timer.Tick += async (_, _) => await PollAsync(); timer.Start();
         FormClosing += ClosingAsync; Shown += (_, _) => { var dark = 1; DwmSetWindowAttribute(Handle, 20, ref dark, sizeof(int)); };
         ShowPage(page);
@@ -56,14 +59,15 @@ internal sealed class MainWindow : Form
     [DllImport("dwmapi.dll")] private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int length);
     private static Button Button(string text, Action action, bool primary = false)
     {
-        var button = new Button { Text = text, AutoSize = true, MinimumSize = new Size(0, 38), FlatStyle = FlatStyle.Flat, ForeColor = primary ? Ground : TextColor, BackColor = primary ? Gold : Input, Padding = new Padding(12, 6, 12, 6), Margin = new Padding(0, 0, 10, 8), AccessibleName = text };
+        var button = new ActionButton { Text = text, AutoSize = true, MinimumSize = new Size(0, 38), FlatStyle = FlatStyle.Flat, ForeColor = primary ? Ground : TextColor, BackColor = primary ? Gold : Input, Padding = new Padding(12, 6, 12, 6), Margin = new Padding(0, 0, 10, 8), AccessibleName = text };
         button.FlatAppearance.BorderSize = primary ? 0 : 1; button.FlatAppearance.BorderColor = Color.FromArgb(75, 75, 82); button.Click += (_, _) => action(); return button;
     }
     private static Label Label(string text, float size = 10, bool strong = false, bool secondary = false) => new()
     { Text = text, AutoSize = true, MaximumSize = new Size(750, 0), Font = new Font("Segoe UI", size, strong ? FontStyle.Bold : FontStyle.Regular), ForeColor = secondary ? Secondary : TextColor, Margin = new Padding(0, 0, 0, 12) };
     private FlowLayoutPanel Screen(string title)
     {
-        content.Controls.Clear(); connections = null; statusLabel = pendingLabel = trafficLabel = speedLabel = connectionsStatus = null;
+        foreach (Control old in content.Controls.Cast<Control>().ToArray()) old.Dispose();
+        content.Controls.Clear(); preferredWidths.Clear(); connections = null; statusLabel = pendingLabel = trafficLabel = speedLabel = connectionsStatus = null;
         connect = apply = import = refresh = speed = null;
         var panel = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(28, 24, 24, 24) };
         panel.Controls.Add(Label(title, 23, true)); content.Controls.Add(panel); return panel;
@@ -80,7 +84,36 @@ internal sealed class MainWindow : Form
     {
         page = name; foreach (var button in navigation) { button.BackColor = button.Text == name ? Color.FromArgb(65, 52, 38) : PanelColor; button.ForeColor = button.Text == name ? Gold : Secondary; }
         switch (name) { case "Подключение": ConnectionPage(); break; case "Приложения": AppsPage(); break; case "Сайты": SitesPage(); break; case "Соединения": ConnectionsPage(); break; default: AboutPage(); break; }
-        UpdateState();
+        AdaptContent(); UpdateState();
+    }
+    private void AdaptContent()
+    {
+        if (adapting || content.Controls.Count == 0 || content.Controls[0] is not FlowLayoutPanel panel) return;
+        adapting = true;
+        try
+        {
+            panel.SuspendLayout();
+            var available = Math.Max(240, content.ClientSize.Width - panel.Padding.Horizontal - 8);
+            foreach (Control child in panel.Controls)
+            {
+                if (child is Label) child.MaximumSize = new Size(available, 0);
+                else if (child is FlowLayoutPanel row) { row.MaximumSize = new Size(available, 0); row.Width = available; }
+                else if (child is DataGridView || child is TextBox { Multiline: true }) child.Width = available;
+                else if (child is ComboBox) { preferredWidths.TryAdd(child, child.Width); child.Width = Math.Min(preferredWidths[child], available); }
+            }
+            panel.ResumeLayout(true);
+        }
+        finally { adapting = false; }
+    }
+    private sealed class ActionButton : Button
+    {
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e); if (Enabled) return;
+            using var fill = new SolidBrush(Input); e.Graphics.FillRectangle(fill, ClientRectangle);
+            using var edge = new Pen(Color.FromArgb(60, 60, 67)); e.Graphics.DrawRectangle(edge, 0, 0, Width - 1, Height - 1);
+            TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, Secondary, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+        }
     }
     private void Changed()
     { store.SaveSettings(); dirty = true; UpdateState(); }
@@ -215,12 +248,15 @@ internal sealed class MainWindow : Form
     { var m = row["metadata"]; return $"Процесс: {Value(m?["processPath"], Value(m?["process"]))}\r\nАдрес: {Value(m?["host"], Value(m?["destinationIP"]))}:{Value(m?["destinationPort"])} · {Value(m?["network"])}\r\nПравило: {Value(row["rule"])} {Value(row["rulePayload"], "")}\r\nЦепочка: {Route(row)}"; }
     private void RenderConnections()
     {
-        if (connections == null) return; connections.Rows.Clear();
+        if (connections == null) return;
+        var selected = connections.SelectedRows.Count > 0 && connections.SelectedRows[0].Tag is JsonObject current ? Value(current["id"], "") : "";
+        connections.Rows.Clear();
         var rows = snapshot?["connections"] as JsonArray;
         if (!engine.Running || rows == null) return;
         foreach (var item in rows.Take(1000).OfType<JsonObject>())
         {
             var m = item["metadata"]; var i = connections.Rows.Add(Value(m?["process"], Path.GetFileName(Value(m?["processPath"], "Не определён"))), Value(m?["host"], Value(m?["destinationIP"])), Value(m?["network"]).ToUpperInvariant(), Route(item), Bytes(item["download"]?.GetValue<long>() ?? 0), Bytes(item["upload"]?.GetValue<long>() ?? 0)); connections.Rows[i].Tag = item;
+            if (selected.Length > 0 && Value(item["id"], "") == selected) connections.CurrentCell = connections.Rows[i].Cells[0];
         }
         if (connectionsStatus != null) connectionsStatus.Text = rows.Count == 0 ? "Туннель запущен. Сейчас нет активных соединений." : $"Активных: {rows.Count}" + (rows.Count > 1000 ? " · показаны первые 1000" : "");
     }

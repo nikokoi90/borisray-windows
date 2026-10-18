@@ -7,7 +7,9 @@ Official unmodified Windows amd64 release with libcronet.dll; upstream notice in
 Upstream: https://github.com/SagerNet/sing-box/tree/v1.14.3
 Pinned source commit: 7054cac5124465ffdb145870d7c01885566711b1
 Official build instructions: https://sing-box.sagernet.org/installation/build-from-source/
-Cronet/Chromium third-party notices: licenses/cronet-NOTICE (from the matching upstream module).
+Cronet Go wrapper notice: licenses/cronet-LICENSE (matching upstream module).
+Chromium notice: licenses/chromium-LICENSE.txt; full upstream third-party sources and notices: https://chromium.googlesource.com/chromium/src/+/refs/heads/main/third_party/.
+Conservative upstream Go module notice collection: licenses/Go-dependencies.txt.
 
 .NET runtime and Windows Forms: MIT, Microsoft and contributors.
 Full runtime and Windows Forms licenses/notices are in licenses/.

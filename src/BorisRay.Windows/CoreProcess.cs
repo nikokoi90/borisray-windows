@@ -25,18 +25,23 @@ internal sealed class CoreProcess : IAsyncDisposable
     private readonly object journalLock = new();
     public bool Running => process is { HasExited: false };
     public bool PhysicalIPv6 { get; private set; }
+    internal string WorkDirectory => directory;
     public event Action? Exited;
     public CoreProcess(string root, bool captureOnly = false)
     {
         this.captureOnly = captureOnly;
         directory = captureOnly ? Directory.CreateDirectory(Path.Combine(root, "capture-core")).FullName : WindowsPlatform.SecureWorkDirectory();
         executable = Path.Combine(directory, "sing-box.exe");
-        CopyVerified(Path.Combine(DistributedCore, "sing-box.exe"), executable, BuildInfo.CoreSha256);
-        CopyVerified(Path.Combine(DistributedCore, "libcronet.dll"), Path.Combine(directory, "libcronet.dll"), BuildInfo.CoreDllSha256);
-        job = CreateJobObject(IntPtr.Zero, null);
-        if (job == IntPtr.Zero) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
-        var info = new JobInfo { Basic = new JobBasic { LimitFlags = 0x2000 } };
-        if (!SetInformationJobObject(job, 9, ref info, (uint)Marshal.SizeOf<JobInfo>())) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        try
+        {
+            CopyVerified(Path.Combine(DistributedCore, "sing-box.exe"), executable, BuildInfo.CoreSha256);
+            CopyVerified(Path.Combine(DistributedCore, "libcronet.dll"), Path.Combine(directory, "libcronet.dll"), BuildInfo.CoreDllSha256);
+            job = CreateJobObject(IntPtr.Zero, null);
+            if (job == IntPtr.Zero) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+            var info = new JobInfo { Basic = new JobBasic { LimitFlags = 0x2000 } };
+            if (!SetInformationJobObject(job, 9, ref info, (uint)Marshal.SizeOf<JobInfo>())) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+        catch { if (job != IntPtr.Zero) CloseHandle(job); try { Directory.Delete(directory, true); } catch (IOException) { } throw; }
     }
     public static int FreePort()
     { var listener = new TcpListener(IPAddress.Loopback, 0); listener.Start(); var port = ((IPEndPoint)listener.LocalEndpoint).Port; listener.Stop(); return port; }
