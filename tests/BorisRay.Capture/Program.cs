@@ -53,6 +53,22 @@ internal static class Capture
                     window.ClientSize = new Size(1100, 780); window.ShowPage(pair.Item1); Snap(window, pair.Item2 + "-desktop");
                     window.ClientSize = new Size(930, 640); window.ShowPage(pair.Item1); Snap(window, pair.Item2 + "-compact");
                 }
+                window.ShowPage("Сайты");
+                var sites = Descendants(window).OfType<DataGridView>().Single(); sites.Rows[0].Cells[1].Value = "Через VPN";
+                if (!reopened.Settings.Sites["gosuslugi.ru"]) throw new Exception("Native site route edit failed");
+                sites.Rows[0].Cells[1].Value = "Напрямую";
+                window.ShowPage("Приложения"); var apps = Descendants(window).OfType<DataGridView>().Single(); apps.Rows[0].Cells[3].Value = false;
+                if (reopened.Settings.Apps[0].IncludeFolder) throw new Exception("Native executable folder edit failed");
+                apps.Rows[0].Cells[3].Value = true;
+                window.ShowPage("Подключение"); window.ClientSize = new Size(1100, 780);
+                using var modalTimer = new System.Windows.Forms.Timer { Interval = 150 };
+                modalTimer.Tick += (_, _) =>
+                {
+                    modalTimer.Stop(); var modal = Application.OpenForms.Cast<Form>().Single(f => f.Text == "Импорт подписки");
+                    var input = Descendants(modal).OfType<TextBox>().Single(); if (!input.UseSystemPasswordChar) throw new Exception("Subscription input is not masked");
+                    input.Text = "https://provider.example/subscription/synthetic"; Snap(modal, "import-dialog"); modal.Close();
+                };
+                modalTimer.Start(); Descendants(window).OfType<Button>().Single(b => b.Text == "Заменить подписку…").PerformClick();
                 Finish(window);
             }
             using (var empty = new MainWindow(new PrivateStore(Path.Combine(temporary, "empty")), captureOnly: true))
@@ -61,13 +77,13 @@ internal static class Capture
             {
                 os = RuntimeInformation.OSDescription, runtime = RuntimeInformation.FrameworkDescription,
                 method = "Native Windows Forms DrawToBitmap on standard GitHub Windows runner; synthetic fixtures; no VPN started",
-                dpapiReload = "passed", protectedSessionAcl = "passed", ownedChildValidationAndCleanup = "passed", executableShortcut = "passed", captures
+                dpapiReload = "passed", protectedSessionAcl = "passed", ownedChildValidationAndCleanup = "passed", executableShortcut = "passed", nativeRuleEditing = "passed", maskedImportDialog = "passed", captures
             }, new JsonSerializerOptions { WriteIndented = true }));
             Console.WriteLine("PASS native Windows Forms capture and isolated DPAPI round trip"); return 0;
         }
         finally { if (Directory.Exists(temporary)) Directory.Delete(temporary, true); }
 
-        void Snap(MainWindow window, string name)
+        void Snap(Form window, string name)
         {
             window.PerformLayout(); Application.DoEvents();
             using var bitmap = new Bitmap(window.Width, window.Height); window.DrawToBitmap(bitmap, new Rectangle(Point.Empty, bitmap.Size));
@@ -77,6 +93,8 @@ internal static class Capture
             captures.Add(new { name, bitmap.Width, bitmap.Height, sampledColors = distinct.Count, dpi = window.DeviceDpi });
         }
     }
+    private static IEnumerable<Control> Descendants(Control parent)
+    { foreach (Control child in parent.Controls) { yield return child; foreach (var nested in Descendants(child)) yield return nested; } }
     private static void Finish(MainWindow window)
     { window.Close(); var limit = DateTime.UtcNow.AddSeconds(10); while (!window.IsDisposed && DateTime.UtcNow < limit) { Application.DoEvents(); Thread.Sleep(10); } if (!window.IsDisposed) throw new Exception("Window failed to close"); }
     private static void Wait(Task task)

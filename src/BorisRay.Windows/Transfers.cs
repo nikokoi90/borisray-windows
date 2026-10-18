@@ -15,10 +15,20 @@ internal static class Transfers
         var uri = Profiles.SubscriptionUri(input);
         using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(25) };
         client.DefaultRequestHeaders.UserAgent.ParseAdd("BorisRay-Windows/0.1.0");
-        using var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token);
-        if (!response.IsSuccessStatusCode) throw new InvalidOperationException("Сервер подписки не ответил успешно. Проверь ссылку и интернет.");
-        var bytes = await ReadBoundedAsync(response.Content, Profiles.MaximumBytes, token);
-        return Encoding.UTF8.GetString(bytes);
+        client.DefaultRequestHeaders.Accept.ParseAdd("text/plain");
+        for (var redirects = 0; redirects <= 3; redirects++)
+        {
+            using var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token);
+            if ((int)response.StatusCode is 301 or 302 or 303 or 307 or 308)
+            {
+                if (redirects == 3 || response.Headers.Location == null) throw new InvalidOperationException("Слишком много перенаправлений подписки. Возьми прямую HTTPS-ссылку у провайдера.");
+                uri = Profiles.SubscriptionUri(new Uri(uri, response.Headers.Location).AbsoluteUri); continue;
+            }
+            if (!response.IsSuccessStatusCode) throw new InvalidOperationException("Сервер подписки не ответил успешно. Проверь ссылку и интернет.");
+            var bytes = await ReadBoundedAsync(response.Content, Profiles.MaximumBytes, token);
+            return Encoding.UTF8.GetString(bytes);
+        }
+        throw new InvalidOperationException("Не удалось получить подписку.");
     }
     public static async Task<byte[]> ReadBoundedAsync(HttpContent content, int limit, CancellationToken token)
     {

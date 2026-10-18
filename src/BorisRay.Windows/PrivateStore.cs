@@ -34,7 +34,6 @@ internal sealed class PrivateStore
             try { Profile = JsonSerializer.Deserialize<DeviceProfile>(Protect(File.ReadAllBytes(profile), false)); if (Profile != null) Nodes = Profiles.Parse(Profile.Raw); }
             catch { throw new InvalidOperationException("Не удалось открыть локальную подписку. Запусти BorisRay под тем же пользователем Windows."); }
         }
-        foreach (var domain in new[] { "yandex.ru", "yandex.net", "ya.ru", "yastatic.net" }) Settings.Sites.TryAdd(domain, false);
     }
 
     public void SaveSettings() => Atomic(Path.Combine(Root, "settings.json"), JsonSerializer.SerializeToUtf8Bytes(Settings, Json));

@@ -15,11 +15,10 @@ public sealed record AppRule(string Path, bool Vpn, bool IncludeFolder = false);
 public sealed class RoutingSettings
 {
     public string Country { get; set; } = "auto";
-    public string Channel { get; set; } = "udp";
+    public string Channel { get; set; } = "all";
     public string Server { get; set; } = "auto";
     public bool DefaultVpn { get; set; } = true;
-    public Dictionary<string, bool> Sites { get; set; } = new(StringComparer.OrdinalIgnoreCase)
-    { ["yandex.ru"] = false, ["yandex.net"] = false, ["ya.ru"] = false, ["yastatic.net"] = false };
+    public Dictionary<string, bool> Sites { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public List<AppRule> Apps { get; set; } = [];
 }
 
@@ -31,12 +30,34 @@ public static class Profiles
         if (!Uri.TryCreate(input.Trim(), UriKind.Absolute, out var uri) || uri.Scheme != "https" ||
             string.IsNullOrWhiteSpace(uri.Host) || uri.UserInfo.Length > 0 || uri.Fragment.Length > 0)
             throw new ArgumentException("Нужна HTTPS-ссылка подписки без логина и фрагмента в адресе.");
-        var host = uri.IdnHost.ToLowerInvariant();
-        if ((host == "borishub.com" || host.EndsWith(".borishub.com", StringComparison.Ordinal)) && uri.AbsolutePath.StartsWith("/j/", StringComparison.Ordinal))
-            return new UriBuilder(uri) { Path = "/s/" + uri.AbsolutePath[3..] }.Uri;
         return uri;
     }
 
+    private static readonly Dictionary<string, (string Name, string Pattern)> Countries = new()
+    {
+        ["pl"] = ("Польша", "poland|warsaw|польш|варшав"), ["fi"] = ("Финляндия", "finland|helsinki|финлянд|хельсинки"),
+        ["de"] = ("Германия", "germany|frankfurt|герман|франкфурт"), ["nl"] = ("Нидерланды", "netherlands|amsterdam|нидерланд|амстердам"),
+        ["us"] = ("США", "united states|usa|сша|new york"), ["gb"] = ("Великобритания", @"united kingdom|london|великобрит|лондон|\buk\b"),
+        ["fr"] = ("Франция", "france|paris|франц|париж"), ["se"] = ("Швеция", "sweden|stockholm|швец|стокгольм"),
+        ["ch"] = ("Швейцария", "switzerland|zurich|швейцар|цюрих"), ["ee"] = ("Эстония", "estonia|tallinn|эстон|таллин"),
+        ["lv"] = ("Латвия", "latvia|riga|латв|рига"), ["lt"] = ("Литва", "lithuania|vilnius|литва|вильнюс"),
+        ["tr"] = ("Турция", "turkey|türkiye|istanbul|турци|стамбул"), ["ru"] = ("Россия", "russia|moscow|росси|москв"),
+        ["kz"] = ("Казахстан", "kazakhstan|казахстан"), ["jp"] = ("Япония", "japan|tokyo|япони|токио"),
+        ["sg"] = ("Сингапур", "singapore|сингапур"), ["hk"] = ("Гонконг", "hong kong|гонконг"),
+        ["ca"] = ("Канада", "canada|toronto|канад|торонто"), ["au"] = ("Австралия", "australia|sydney|австрали|сидней"),
+        ["es"] = ("Испания", "spain|madrid|испани|мадрид"), ["it"] = ("Италия", "italy|milan|итали|милан"),
+        ["at"] = ("Австрия", "austria|vienna|австрия|вена"), ["cz"] = ("Чехия", "czech|prague|чехи|прага")
+    };
+    public static string CountryName(string code) => Countries.TryGetValue(code, out var value) ? value.Name : code.ToUpperInvariant();
+    private static string CountryFromName(string name)
+    {
+        foreach (var (code, value) in Countries)
+        {
+            var flag = string.Concat(code.ToUpperInvariant().Select(c => char.ConvertFromUtf32(0x1f1e6 + c - 'A')));
+            if (name.Contains(flag, StringComparison.Ordinal) || Regex.IsMatch(name, @"\b" + code + @"\b|" + value.Pattern, RegexOptions.IgnoreCase)) return code;
+        }
+        return "auto";
+    }
     public static string Domain(string input)
     {
         var text = input.Trim().TrimEnd('.').ToLowerInvariant();
@@ -83,9 +104,7 @@ public static class Profiles
         if (Get("insecure") == "1" || Get("allowInsecure") == "1") throw new ArgumentException("Insecure TLS");
         var name = uri.Fragment.Length > 1 ? Decode(uri.Fragment[1..]) : $"Сервер {index + 1}";
         name = new string(name.Where(c => !char.IsControl(c)).Take(160).ToArray());
-        var lower = name.ToLowerInvariant();
-        var country = lower.Contains("🇵🇱", StringComparison.Ordinal) || Regex.IsMatch(lower, @"\b(pl|poland|warsaw)\b") || lower.Contains("польш", StringComparison.Ordinal) || lower.Contains("варшав", StringComparison.Ordinal) ? "pl" :
-            lower.Contains("🇫🇮", StringComparison.Ordinal) || Regex.IsMatch(lower, @"\b(fi|finland|helsinki)\b") || lower.Contains("финлянд", StringComparison.Ordinal) ? "fi" : "auto";
+        var country = CountryFromName(name);
         var tls = new JsonObject { ["enabled"] = true, ["server_name"] = Get("sni", Get("peer", uri.Host)) };
         var node = new JsonObject { ["tag"] = $"{name} · {index + 1}", ["server"] = uri.Host.Trim('[', ']'), ["server_port"] = uri.Port, ["tls"] = tls };
         string channel;

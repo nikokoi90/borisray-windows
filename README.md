@@ -1,8 +1,8 @@
 # BorisRay for Windows
 
-Personal Windows 11 x64 client for BorisHub, using native Windows Forms and the official unmodified sing-box 1.14.3 core. Independent client; no affiliation with SagerNet or Amnezia. No subscription or server administrator credential is included.
+Free provider-neutral Windows 11 x64 VPN subscription client, using native Windows Forms and the official unmodified sing-box 1.14.3 core. Independent client; no affiliation with SagerNet or Amnezia. No subscription or server administrator credential is included.
 
-Features: VLESS Reality/TCP and Hysteria2/UDP, explicit country profiles, process executable/folder rules, domain rules with matching DNS policy, local connection inspection, bounded HTTPS throughput/latency probe, and manual BorisHub update checks. Subscriptions use Windows CurrentUser DPAPI. The system tunnel needs elevation; this version requests UAC at launch.
+Features: VLESS Reality/TCP and Hysteria2/UDP, explicit country profiles, process executable/folder rules, domain rules with matching DNS policy, local connection inspection, bounded HTTPS throughput/latency probe, and manual BorisRay update checks. Subscriptions use Windows CurrentUser DPAPI. The system tunnel needs elevation; this version requests UAC at launch.
 
 See [Russian installation instructions](README.txt). This initial release still requires a real Windows 11 network acceptance test; native CI rendering and `sing-box check` do not prove successful TUN connectivity.
 

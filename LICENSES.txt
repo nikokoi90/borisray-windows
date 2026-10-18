@@ -1,4 +1,4 @@
-BorisRay Windows client — personal BorisHub family client, 2026.
+BorisRay Windows client — free provider-neutral subscription client, 2026.
 Client source: GNU GPL version 3 or later; see LICENSE and licenses/GPL-3.0.txt.
 No affiliation with or endorsement by SagerNet, Amnezia, Microsoft or Apple.
 

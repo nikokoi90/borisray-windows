@@ -10,6 +10,8 @@ void Reject(Action action, string name) { try { action(); } catch (ArgumentExcep
 var tcp = "vless://00000000-0000-4000-8000-000000000001@entry.example:443?security=reality&type=tcp&sni=example.com&pbk=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&sid=12#Poland%20TCP";
 var udp = "hysteria2://synthetic-password@udp.example:443?sni=example.com#Finland%20UDP";
 var raw = tcp + "\n" + udp;
+Check(new RoutingSettings().Sites.Count == 0, "new public client has no hidden provider-specific bypasses");
+Check(Profiles.Parse(tcp.Replace("Poland%20TCP", "Germany%20TCP"))[0].Country == "de", "additional explicit countries supported");
 var nodes = Profiles.Parse(raw);
 Check(nodes.Count == 2 && nodes[0].Country == "pl" && nodes[1].Country == "fi", "explicit country and transport labels");
 Check(Profiles.Parse(Convert.ToBase64String(Encoding.UTF8.GetBytes(raw))).Count == 2, "base64 list imports atomically");
@@ -18,7 +20,7 @@ Reject(() => Profiles.Parse(udp.Replace("sni=", "insecure=1&sni=")), "insecure T
 Reject(() => Profiles.Parse(tcp.Replace("type=tcp", "type=ws")), "unsupported VLESS transport rejected");
 Reject(() => Profiles.Parse("hysteria2://bad"), "missing host/port rejected");
 Reject(() => Profiles.Parse(new string('x', Profiles.MaximumBytes + 1)), "bounded subscription");
-Check(Profiles.SubscriptionUri("https://fv1.borishub.com/j/synthetic-token").AbsolutePath == "/s/synthetic-token", "BorisHub JSON link normalized");
+Check(Profiles.SubscriptionUri("https://provider.example/j/synthetic-token").AbsolutePath == "/j/synthetic-token", "provider subscription URL is preserved");
 Check(Profiles.SubscriptionUri("https://other.example/j/synthetic-token").AbsolutePath == "/j/synthetic-token", "external subscription path untouched");
 Reject(() => Profiles.SubscriptionUri("https://user:secret@borishub.com/s/token"), "userinfo forbidden");
 Reject(() => Profiles.SubscriptionUri("http://borishub.com/s/token"), "plaintext subscription forbidden");
@@ -48,6 +50,9 @@ Check(config["inbounds"]![0]!["type"]!.GetValue<string>() == "tun" && config["ex
 var measurement = Configuration.Build(nodes, settings, false, 17991, "synthetic-api-secret", 17992, "synthetic-proxy-password", true);
 Check(measurement["route"]!["final"]!.GetValue<string>() == "vpn" && !measurement["route"]!["rules"]!.AsArray().OfType<JsonObject>().Any(r => r.ContainsKey("process_path_regex") || r.ContainsKey("domain_suffix")), "speed probe cannot inherit direct site/app rules");
 settings.Country = "pl"; settings.Channel = "udp"; Reject(() => Configuration.Build(nodes, settings, false, 17991, "test"), "unavailable country/channel does not silently fall back");
+var hierarchy = new RoutingSettings { Channel = "all", Apps = [app, new AppRule(@"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\bin\win64\child.exe", true)] };
+var ordered = Configuration.Build(nodes, hierarchy, false, 17991, "synthetic-api-secret")["route"]!["rules"]!.AsArray().OfType<JsonObject>().Where(r => r.ContainsKey("process_path_regex")).ToList();
+Check(ordered[0]["outbound"]!.GetValue<string>() == "vpn", "exact executable rule precedes containing folder rule");
 settings.Country = "auto"; settings.Channel = "all";
 var output = args.Length > 0 ? args[0] : Path.Combine(Path.GetTempPath(), "borisray-windows-config-checks"); Directory.CreateDirectory(output);
 for (var ipv6 = 0; ipv6 < 2; ipv6++)

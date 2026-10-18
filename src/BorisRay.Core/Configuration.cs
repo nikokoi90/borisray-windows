@@ -47,7 +47,7 @@ public static class Configuration
                 routes.Add(new JsonObject { ["domain_suffix"] = Array([domain]), ["action"] = "route", ["outbound"] = target });
                 dnsRules.Add(new JsonObject { ["domain_suffix"] = Array([domain]), ["server"] = site.Value ? "private-dns" : "bootstrap" });
             }
-            foreach (var app in settings.Apps)
+            foreach (var app in settings.Apps.OrderBy(a => a.IncludeFolder).ThenByDescending(a => a.Path.Length))
             {
                 var pattern = AppPattern(app);
                 routes.Add(new JsonObject { ["process_path_regex"] = Array([pattern]), ["action"] = "route", ["outbound"] = app.Vpn ? "vpn" : "direct" });

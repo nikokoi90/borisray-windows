@@ -12,15 +12,15 @@ The owner previously authorized another client base. This port uses native C# Wi
 
 ## Users
 
-Boris's wife, on Windows 11 Intel/x64, as explicitly answered by the owner. Boris also uses the existing macOS and Honor clients.
+People using their own VPN subscriptions on Windows 11 Intel/AMD x64. The owner explicitly wants to distribute the Windows client for free. This revision is Windows only; existing Mac and Android clients are outside scope.
 
 ## Product Purpose
 
-Connect a separate device subscription to family BorisHub, choose application and website routes, and inspect actual connections.
+Import a user-provided VPN subscription, connect and choose application/website routes, and inspect actual connections. The software is free; it does not supply a VPN service or server access.
 
 ## Capabilities and Constraints
 
-Real connect/disconnect, TCP VLESS Reality and UDP Hysteria2, country/server selection from explicit subscription labels, application and domain rules, connection monitoring, bounded speed/upload/HTTPS latency. Website rules precede application rules. An application shortcut must resolve to its actual executable. Device credentials stay private and outside distributable files. Family administrator access belongs to the existing Mac dashboard, not this device client. Existing Mac VPN and server routes must remain untouched. The Windows tunnel needs administrator consent; compilation/config checks are distinct from Windows kernel routing acceptance.
+Real connect/disconnect, TCP VLESS Reality and UDP Hysteria2, country/server selection from explicit subscription labels, application and domain rules, connection monitoring, bounded speed/upload/HTTPS latency. Website rules precede application rules. An application shortcut must resolve to its actual executable. Device credentials stay private and outside distributable files. No family administration or bundled provider credential. No provider-specific default routes. Existing Mac VPN and server routes must remain untouched. The Windows tunnel needs administrator consent; compilation/config checks are distinct from Windows kernel routing acceptance.
 
 ## Brand Commitments
 
@@ -28,4 +28,4 @@ Inherit the approved English gold BorisRay wordmark, original golden manta, dark
 
 ## Evidence on Hand
 
-Canonical Mac PRODUCT.md, DESIGN.md, Sources/App.swift and Assets/boris-ray-icon.png under ../2026-10-17/lichny-borisa-split; Android's strict subscription parser and physical-network DNS strategy. Windows source will be cross-compiled on this Mac. A native Windows session has not yet been evidenced. No family secrets are embedded.
+Canonical Mac PRODUCT.md, DESIGN.md, Sources/App.swift and Assets/boris-ray-icon.png under ../2026-10-17/lichny-borisa-split; Android's strict subscription parser and physical-network DNS strategy. Windows source is cross-compiled on this Mac and built/tested on the standard GitHub Windows runner, including DPAPI, protected engine staging, shortcut resolution and native Forms bitmap captures. Physical Windows 11 TUN acceptance is still outstanding. No family secrets are embedded.

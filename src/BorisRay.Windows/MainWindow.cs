@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
@@ -46,8 +47,8 @@ internal sealed class MainWindow : Form
         brand.Controls.Add(new Label { Text = "BorisRay", AutoSize = true, Font = new Font("Georgia", 20, FontStyle.Bold), ForeColor = Gold, Padding = new Padding(0, 4, 0, 0) });
         var nav = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(0, 12, 0, 0) };
         foreach (var name in new[] { "Подключение", "Приложения", "Сайты", "Соединения", "О приложении" })
-        { var button = Button(name, () => ShowPage(name)); button.Width = 198; button.Height = 44; button.TextAlign = ContentAlignment.MiddleLeft; navigation.Add(button); nav.Controls.Add(button); }
-        var footer = new Panel { Dock = DockStyle.Bottom, Height = 60, Padding = new Padding(2, 8, 0, 0) }; footer.Controls.Add(state);
+        { var button = Button(name, () => ShowPage(name)); button.Width = 198; button.Height = 44; button.TextAlign = ContentAlignment.MiddleLeft; ((ActionButton)button).Borderless = true; navigation.Add(button); nav.Controls.Add(button); }
+        var footer = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 78, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(2, 8, 0, 0) }; footer.Controls.Add(state); footer.Controls.Add(new Label { Text = "0.1.0 · Бесплатный клиент", AutoSize = true, ForeColor = Secondary, Font = new Font("Segoe UI", 9), Margin = new Padding(0, 8, 0, 0) });
         sidebar.Controls.Add(nav); sidebar.Controls.Add(brand); sidebar.Controls.Add(footer);
         var center = new Panel { Dock = DockStyle.Fill }; center.Controls.Add(content); center.Controls.Add(banner);
         Controls.Add(center); Controls.Add(sidebar);
@@ -76,7 +77,8 @@ internal sealed class MainWindow : Form
     { var row = new FlowLayoutPanel { AutoSize = true, WrapContents = true, FlowDirection = FlowDirection.LeftToRight, MaximumSize = new Size(780, 0), Margin = new Padding(0, 0, 0, 8) }; row.Controls.AddRange(controls); return row; }
     private static ComboBox Combo(IEnumerable<string> values, string selected, Action<string> changed, int width = 300)
     {
-        var box = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = width, BackColor = Input, ForeColor = TextColor, Margin = new Padding(0, 0, 14, 10), AccessibleName = "Выбор: " + selected };
+        var box = new ComboBox { FlatStyle = FlatStyle.Flat, DrawMode = DrawMode.OwnerDrawFixed, ItemHeight = 27, DropDownStyle = ComboBoxStyle.DropDownList, Width = width, BackColor = Input, ForeColor = TextColor, Margin = new Padding(0, 0, 14, 10), AccessibleName = "Выбор: " + selected };
+        box.DrawItem += (_, e) => { if (e.Index < 0 || e.Graphics == null) return; var chosen = (e.State & DrawItemState.Selected) != 0; using var brush = new SolidBrush(chosen ? Color.FromArgb(65, 52, 38) : Input); e.Graphics.FillRectangle(brush, e.Bounds); TextRenderer.DrawText(e.Graphics, box.Items[e.Index]?.ToString() ?? "", box.Font, new Rectangle(e.Bounds.X + 9, e.Bounds.Y, e.Bounds.Width - 18, e.Bounds.Height), TextColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis); e.DrawFocusRectangle(); };
         foreach (var value in values) box.Items.Add(value); box.SelectedItem = selected;
         box.SelectedIndexChanged += (_, _) => { if (box.SelectedItem is string value) changed(value); }; return box;
     }
@@ -94,57 +96,94 @@ internal sealed class MainWindow : Form
         {
             panel.SuspendLayout();
             var available = Math.Max(240, content.ClientSize.Width - panel.Padding.Horizontal - 8);
-            foreach (Control child in panel.Controls)
+            void Fit(Control child, int width)
             {
-                if (child is Label) child.MaximumSize = new Size(available, 0);
-                else if (child is FlowLayoutPanel row) { row.MaximumSize = new Size(available, 0); row.Width = available; }
-                else if (child is DataGridView || child is TextBox { Multiline: true }) child.Width = available;
-                else if (child is ComboBox) { preferredWidths.TryAdd(child, child.Width); child.Width = Math.Min(preferredWidths[child], available); }
+                if (child is Label) child.MaximumSize = new Size(width, 0);
+                else if (child is FlowLayoutPanel flow)
+                {
+                    flow.MaximumSize = new Size(width, 0);
+                    if (flow.FlowDirection == FlowDirection.LeftToRight) flow.Width = width;
+                    foreach (Control nested in flow.Controls) Fit(nested, width);
+                }
+                else if (child is DataGridView || child is TextBox { Multiline: true }) child.Width = width;
+                else if (child is ComboBox) { preferredWidths.TryAdd(child, child.Width); child.Width = Math.Min(preferredWidths[child], width); }
             }
+            foreach (Control child in panel.Controls) Fit(child, available);
             panel.ResumeLayout(true);
         }
         finally { adapting = false; }
     }
     private sealed class ActionButton : Button
     {
+        public bool Borderless;
+        public bool Power;
+        private bool hover, pressed;
+        public ActionButton() { SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true); UseVisualStyleBackColor = false; }
+        protected override void OnMouseEnter(EventArgs e) { hover = true; Invalidate(); base.OnMouseEnter(e); }
+        protected override void OnMouseLeave(EventArgs e) { hover = pressed = false; Invalidate(); base.OnMouseLeave(e); }
+        protected override void OnMouseDown(MouseEventArgs e) { pressed = true; Invalidate(); base.OnMouseDown(e); }
+        protected override void OnMouseUp(MouseEventArgs e) { pressed = false; Invalidate(); base.OnMouseUp(e); }
+        protected override void OnGotFocus(EventArgs e) { Invalidate(); base.OnGotFocus(e); }
+        protected override void OnLostFocus(EventArgs e) { Invalidate(); base.OnLostFocus(e); }
         protected override void OnPaint(PaintEventArgs e)
         {
-            base.OnPaint(e); if (Enabled) return;
-            using var fill = new SolidBrush(Input); e.Graphics.FillRectangle(fill, ClientRectangle);
-            using var edge = new Pen(Color.FromArgb(60, 60, 67)); e.Graphics.DrawRectangle(edge, 0, 0, Width - 1, Height - 1);
-            TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, Secondary, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+            e.Graphics.Clear(Parent?.BackColor ?? Ground); e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            var color = Enabled ? BackColor : Input;
+            if (Enabled && hover) color = ControlPaint.Light(color, .08f);
+            if (Enabled && pressed) color = ControlPaint.Dark(color, .1f);
+            using var path = new GraphicsPath(); var r = new RectangleF(.5f, .5f, Width - 1, Height - 1); const float d = 16;
+            path.AddArc(r.X, r.Y, d, d, 180, 90); path.AddArc(r.Right - d, r.Y, d, d, 270, 90); path.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90); path.AddArc(r.X, r.Bottom - d, d, d, 90, 90); path.CloseFigure();
+            using var fill = new SolidBrush(color); e.Graphics.FillPath(fill, path);
+            if (!Borderless && BackColor != Gold) { using var edge = new Pen(Color.FromArgb(65, 65, 73)); e.Graphics.DrawPath(edge, path); }
+            var ink = Enabled ? ForeColor : Secondary;
+            var bounds = ClientRectangle; if (Power) { bounds.X += 22; bounds.Width -= 22; using var pen = new Pen(ink, 1.8f) { StartCap = LineCap.Round, EndCap = LineCap.Round }; var cy = Height / 2f; e.Graphics.DrawArc(pen, 18, cy - 8, 16, 16, -48, 276); e.Graphics.DrawLine(pen, 26, cy - 10, 26, cy - 1); }
+            var flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | (TextAlign == ContentAlignment.MiddleLeft ? TextFormatFlags.Left : TextFormatFlags.HorizontalCenter);
+            if (TextAlign == ContentAlignment.MiddleLeft) { bounds.X += 16; bounds.Width -= 24; }
+            TextRenderer.DrawText(e.Graphics, Text, Font, bounds, ink, flags);
+            if (Focused && ShowFocusCues) { using var focus = new Pen(Gold, 2) { DashStyle = DashStyle.Dot }; e.Graphics.DrawRectangle(focus, 4, 4, Width - 9, Height - 9); }
         }
+    }
+    private static FlowLayoutPanel Field(string title, Control input)
+    {
+        var field = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0, 0, 16, 0) };
+        var label = Label(title, strong: true); label.Margin = new Padding(0, 0, 0, 6); field.Controls.Add(label); field.Controls.Add(input); return field;
     }
     private void Changed()
     { store.SaveSettings(); dirty = true; UpdateState(); }
     private void ConnectionPage()
     {
         var panel = Screen("Подключение");
-        panel.Controls.Add(Label("BorisHub · Windows", 16, true));
-        panel.Controls.Add(Label(store.Nodes.Count == 0 ? "Добавь отдельную подписку для этого компьютера." : $"{store.Nodes.Count} вариантов подключения · ключи защищены учётной записью Windows", secondary: true));
-        import = Button("Добавить подписку", () => ImportProfile()); refresh = Button("Обновить подписку", () => _ = RunAsync(RefreshProfileAsync));
-        panel.Controls.Add(Row(import, refresh));
-        panel.Controls.Add(Label("Страна выхода", strong: true));
-        var countryNames = new Dictionary<string, string> { ["auto"] = "Автовыбор страны", ["fi"] = "Финляндия", ["pl"] = "Польша" };
-        var countryChoices = countryNames.Select(x => x.Key != "auto" && !store.Nodes.Any(n => n.Country == x.Key) ? x.Value + " · нет профиля" : x.Value).ToList();
-        var countryIndex = countryNames.Keys.ToList().IndexOf(store.Settings.Country);
-        panel.Controls.Add(Combo(countryChoices, countryChoices[Math.Max(countryIndex, 0)], value => { store.Settings.Country = countryNames.Keys.ElementAt(countryChoices.IndexOf(value)); store.Settings.Server = "auto"; Changed(); ShowPage(page); }));
-        panel.Controls.Add(Label("Канал", strong: true));
-        panel.Controls.Add(Combo(["TCP · VLESS Reality", "UDP · Hysteria2", "Все · TCP + UDP"], store.Settings.Channel switch { "tcp" => "TCP · VLESS Reality", "udp" => "UDP · Hysteria2", _ => "Все · TCP + UDP" }, value => { store.Settings.Channel = value.StartsWith("TCP", StringComparison.Ordinal) ? "tcp" : value.StartsWith("UDP", StringComparison.Ordinal) ? "udp" : "all"; store.Settings.Server = "auto"; Changed(); ShowPage(page); }));
-        panel.Controls.Add(Label("Сервер", strong: true));
-        var nodes = Configuration.Selected(store.Nodes, store.Settings); var choices = new[] { "Автовыбор сервера" }.Concat(nodes.Select(n => n.Tag)).ToList();
-        panel.Controls.Add(Combo(choices, choices.Contains(store.Settings.Server, StringComparer.Ordinal) ? store.Settings.Server : choices[0], value => { store.Settings.Server = value == choices[0] ? "auto" : value; Changed(); }, 590));
-        panel.Controls.Add(Label("Остальной трафик", strong: true));
-        panel.Controls.Add(Combo(["Через BorisHub", "Напрямую"], store.Settings.DefaultVpn ? "Через BorisHub" : "Напрямую", value => { store.Settings.DefaultVpn = value == "Через BorisHub"; Changed(); }));
-        panel.Controls.Add(Label("Сначала применяются правила сайтов, затем приложений. Всё остальное идёт по выбранному маршруту.", secondary: true));
-        connect = Button("Подключить VPN", () => _ = RunAsync(ConnectOrStopAsync), true);
+        connect = Button("Подключить VPN", () => _ = RunAsync(ConnectOrStopAsync), true); connect.MinimumSize = new Size(208, 54); connect.Font = new Font(Font, FontStyle.Bold); ((ActionButton)connect).Power = true;
+        statusLabel = Label("VPN выключен", 18, true); statusLabel.Padding = new Padding(8, 9, 0, 0);
         apply = Button("Применить маршруты", () => _ = RunAsync(async () => { await engine.StopAsync(); await StartAsync(); }));
-        panel.Controls.Add(Row(connect, apply)); statusLabel = Label("VPN выключен", 12, true); panel.Controls.Add(statusLabel);
+        panel.Controls.Add(Row(connect, statusLabel, apply));
         pendingLabel = Label("", secondary: true); panel.Controls.Add(pendingLabel);
+        panel.Controls.Add(Label(store.Nodes.Count == 0 ? "Добавь свою подписку" : $"Подписка · {store.Nodes.Count} серверов", 14, true));
+        import = Button(store.Nodes.Count == 0 ? "Добавить по ссылке…" : "Заменить подписку…", ImportProfile, store.Nodes.Count == 0);
+        refresh = Button("Обновить", () => _ = RunAsync(RefreshProfileAsync));
+        panel.Controls.Add(Row(import, Button("Из файла…", ImportFile), refresh));
+        if (store.Nodes.Count == 0) panel.Controls.Add(Label("Ссылка от твоего VPN-провайдера, VLESS Reality или Hysteria2. Клиент бесплатный; серверы и подписку выбираешь сам.", secondary: true));
+        var countries = new Dictionary<string, string> { ["auto"] = "Все страны" };
+        foreach (var code in store.Nodes.Select(n => n.Country).Where(c => c != "auto").Distinct().OrderBy(Profiles.CountryName)) countries[code] = Profiles.CountryName(code);
+        var countryValues = countries.Values.ToList();
+        var country = Combo(countryValues, countries.GetValueOrDefault(store.Settings.Country, "Все страны"), value => { store.Settings.Country = countries.First(x => x.Value == value).Key; store.Settings.Server = "auto"; Changed(); ShowPage(page); }, 270);
+        var channel = Combo(["Авто · TCP + UDP", "TCP · VLESS Reality", "UDP · Hysteria2"], store.Settings.Channel switch { "tcp" => "TCP · VLESS Reality", "udp" => "UDP · Hysteria2", _ => "Авто · TCP + UDP" }, value => { store.Settings.Channel = value.StartsWith("TCP", StringComparison.Ordinal) ? "tcp" : value.StartsWith("UDP", StringComparison.Ordinal) ? "udp" : "all"; store.Settings.Server = "auto"; Changed(); ShowPage(page); }, 270);
+        panel.Controls.Add(Row(Field("Страна", country), Field("Канал", channel)));
+        var nodes = Configuration.Selected(store.Nodes, store.Settings); var choices = new[] { "Автовыбор · по доступности и задержке" }.Concat(nodes.Select(n => n.Tag)).ToList();
+        panel.Controls.Add(Field("Сервер", Combo(choices, choices.Contains(store.Settings.Server, StringComparer.Ordinal) ? store.Settings.Server : choices[0], value => { store.Settings.Server = value == choices[0] ? "auto" : value; Changed(); }, 590)));
+        panel.Controls.Add(Field("Остальной трафик", Combo(["Через VPN", "Напрямую"], store.Settings.DefaultVpn ? "Через VPN" : "Напрямую", value => { store.Settings.DefaultVpn = value == "Через VPN"; Changed(); }, 270)));
+        panel.Controls.Add(Row(Button($"Приложения · {store.Settings.Apps.Count}", () => ShowPage("Приложения")), Button($"Сайты · {store.Settings.Sites.Count}", () => ShowPage("Сайты"))));
+        panel.Controls.Add(Label("Правила сайтов имеют приоритет, затем применяются правила приложений и общий маршрут.", secondary: true));
+        speed = Button("Измерить", Measure); panel.Controls.Add(Row(Label("Скорость и пинг", 14, true), speed));
+        speedLabel = Label(speedText); panel.Controls.Add(speedLabel);
         trafficLabel = Label("Получено: 0 Б · отправлено: 0 Б", secondary: true); panel.Controls.Add(trafficLabel);
-        panel.Controls.Add(Label("Скорость и пинг", 14, true)); speedLabel = Label(speedText); panel.Controls.Add(speedLabel);
-        speed = Button("Измерить скорость", Measure); panel.Controls.Add(speed);
-        panel.Controls.Add(Label("Замер через выбранный VPN: 5 МиБ загрузки, 1 МиБ отдачи и три HTTPS-запроса. Пинг включает установку соединения.", secondary: true));
+        panel.Controls.Add(Label("Замер через выбранный сервер: 5 МиБ загрузки, 1 МиБ отдачи. Пинг измеряется HTTPS-запросами.", secondary: true));
+    }
+    private void ImportFile()
+    {
+        using var picker = new OpenFileDialog { Title = "Список профилей", Filter = "Текстовые подписки|*.txt;*.conf|Все файлы|*.*", CheckFileExists = true };
+        if (picker.ShowDialog(this) != DialogResult.OK) return;
+        _ = RunAsync(async () => { if (new FileInfo(picker.FileName).Length > Profiles.MaximumBytes) throw new ArgumentException("Файл больше 1 МиБ."); await ImportAsync(await File.ReadAllTextAsync(picker.FileName)); ShowPage("Подключение"); });
     }
     private async Task ConnectOrStopAsync()
     { if (engine.Running) await engine.StopAsync(); else await StartAsync(); }
@@ -157,12 +196,12 @@ internal sealed class MainWindow : Form
     { if (string.IsNullOrWhiteSpace(store.Profile?.Source)) throw new ArgumentException("Добавь HTTPS-ссылку подписки для обновления."); await ImportAsync(store.Profile.Source); }
     private void ImportProfile()
     {
-        using var dialog = new Form { Text = "Подписка BorisHub", Size = new Size(620, 260), StartPosition = FormStartPosition.CenterParent, BackColor = Ground, ForeColor = TextColor, Font = Font, MinimizeBox = false, MaximizeBox = false };
-        var explanation = Label("HTTPS-ссылка подписки или один VLESS/Hysteria2-профиль. Содержимое останется на этом компьютере."); explanation.Dock = DockStyle.Top; explanation.Padding = new Padding(16);
+        using var dialog = new Form { Text = "Импорт подписки", Size = new Size(620, 260), StartPosition = FormStartPosition.CenterParent, BackColor = Ground, ForeColor = TextColor, Font = Font, MinimizeBox = false, MaximizeBox = false };
+        var explanation = Label("HTTPS-ссылка от твоего провайдера или один VLESS Reality / Hysteria2-профиль. Новая подписка заменит текущую; правила сохранятся."); explanation.Dock = DockStyle.Top; explanation.Padding = new Padding(16);
         var input = new TextBox { Dock = DockStyle.Top, UseSystemPasswordChar = true, MaxLength = Profiles.MaximumBytes, BackColor = Input, ForeColor = TextColor, AccessibleName = "Приватная ссылка подписки" };
         var show = new CheckBox { Text = "Показать ссылку", Dock = DockStyle.Top, AutoSize = true, Padding = new Padding(16, 8, 0, 8) }; show.CheckedChanged += (_, _) => input.UseSystemPasswordChar = !show.Checked;
         var buttons = Row(Button("Добавить", () => { dialog.DialogResult = DialogResult.OK; dialog.Close(); }, true), Button("Отмена", () => dialog.Close())); buttons.Dock = DockStyle.Bottom;
-        dialog.Controls.Add(show); dialog.Controls.Add(input); dialog.Controls.Add(explanation); dialog.Controls.Add(buttons);
+        dialog.Controls.Add(show); dialog.Controls.Add(input); dialog.Controls.Add(explanation); dialog.Controls.Add(buttons); dialog.AcceptButton = (IButtonControl)buttons.Controls[0]; dialog.CancelButton = (IButtonControl)buttons.Controls[1];
         if (dialog.ShowDialog(this) == DialogResult.OK) { var value = input.Text; _ = RunAsync(async () => { await ImportAsync(value); ShowPage("Подключение"); }); }
     }
     private async Task ImportAsync(string input)
@@ -177,21 +216,35 @@ internal sealed class MainWindow : Form
         var grid = new DataGridView { Width = 780, Height = 400, BackgroundColor = Ground, BorderStyle = BorderStyle.None, RowHeadersVisible = false, AllowUserToAddRows = false, AllowUserToDeleteRows = false, AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = false, EnableHeadersVisualStyles = false, ForeColor = TextColor, GridColor = Color.FromArgb(60, 60, 67), AccessibleName = page };
         grid.DefaultCellStyle = new DataGridViewCellStyle { BackColor = Ground, ForeColor = TextColor, SelectionBackColor = Color.FromArgb(65, 52, 38), SelectionForeColor = TextColor, Padding = new Padding(4), Font = Font };
         grid.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { BackColor = PanelColor, ForeColor = TextColor, Font = new Font(Font, FontStyle.Bold) };
-        grid.RowTemplate.Height = 35;
+        grid.RowTemplate.Height = 40; grid.ColumnHeadersHeight = 36; grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing; grid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
         foreach (var heading in headings) grid.Columns.Add(heading, heading);
         grid.DataError += (_, e) => { e.ThrowException = false; };
         return grid;
     }
     private void AppsPage()
     {
-        var panel = Screen("Приложения"); panel.Controls.Add(Label("Выбери настоящий .exe или ярлык. Правила сайтов имеют приоритет. Изменения применяются на экране подключения.", secondary: true));
-        panel.Controls.Add(Row(Button("Добавить приложение…", AddApplication), Button("Из запущенных…", PickRunningApplication)));
-        var grid = Grid("Приложение", "Путь", "Маршрут", "Папка"); grid.Columns[0].ReadOnly = grid.Columns[1].ReadOnly = grid.Columns[3].ReadOnly = true;
-        grid.Columns.RemoveAt(2); grid.Columns.Insert(2, new DataGridViewComboBoxColumn { HeaderText = "Маршрут", Name = "Маршрут", DataSource = new[] { "Через VPN", "Напрямую", "По умолчанию" }, FlatStyle = FlatStyle.Flat });
-        foreach (var rule in store.Settings.Apps) { var i = grid.Rows.Add(Path.GetFileName(rule.Path), rule.Path, rule.Vpn ? "Через VPN" : "Напрямую", rule.IncludeFolder ? "Включая подпапки" : "Только этот .exe"); grid.Rows[i].Tag = rule; }
+        var panel = Screen("Приложения"); panel.Controls.Add(Label("Выбери маршрут для программы. Сайты имеют приоритет; остальные приложения используют общий маршрут.", secondary: true));
+        panel.Controls.Add(Row(Button("Добавить приложение…", AddApplication, true), Button("Из запущенных…", PickRunningApplication)));
+        var grid = Grid("Приложение", "Путь", "Маршрут", "Папка"); grid.Height = 300; grid.Columns[0].ReadOnly = grid.Columns[1].ReadOnly = true;
+        grid.Columns.RemoveAt(3); grid.Columns.Insert(3, new DataGridViewCheckBoxColumn { HeaderText = "Подпапки", Name = "Папка", FlatStyle = FlatStyle.Flat, FillWeight = 55 });
+        grid.Columns.RemoveAt(2); grid.Columns.Insert(2, new DataGridViewComboBoxColumn { HeaderText = "Маршрут", Name = "Маршрут", DataSource = new[] { "Через VPN", "Напрямую" }, FlatStyle = FlatStyle.Flat, FillWeight = 85 });
+        grid.Columns[1].FillWeight = 160;
+        foreach (var rule in store.Settings.Apps) { var i = grid.Rows.Add(Path.GetFileName(rule.Path), rule.Path, rule.Vpn ? "Через VPN" : "Напрямую", rule.IncludeFolder); grid.Rows[i].Tag = rule; }
+        var pathLabel = new TextBox { Multiline = true, ReadOnly = true, Width = 780, Height = 54, BackColor = Input, ForeColor = TextColor, ScrollBars = ScrollBars.Vertical, AccessibleName = "Полный путь выбранного приложения" };
+        void Selection() { pathLabel.Text = grid.SelectedRows.Count > 0 && grid.SelectedRows[0].Tag is AppRule rule ? rule.Path : "Выбери приложение, чтобы увидеть полный путь."; }
+        grid.SelectionChanged += (_, _) => Selection();
+        var changing = false;
         grid.CurrentCellDirtyStateChanged += (_, _) => { if (grid.IsCurrentCellDirty) grid.CommitEdit(DataGridViewDataErrorContexts.Commit); };
-        grid.CellValueChanged += (_, e) => { if (e.RowIndex < 0 || e.ColumnIndex != 2 || grid.Rows[e.RowIndex].Tag is not AppRule rule) return; var value = grid.Rows[e.RowIndex].Cells[2].Value?.ToString(); store.Settings.Apps.Remove(rule); if (value != "По умолчанию") { var next = rule with { Vpn = value == "Через VPN" }; store.Settings.Apps.Add(next); grid.Rows[e.RowIndex].Tag = next; } else grid.Rows.RemoveAt(e.RowIndex); Changed(); };
-        panel.Controls.Add(grid); if (store.Settings.Apps.Count == 0) panel.Controls.Add(Label("Пока нет отдельных правил. Приложения используют маршрут остального трафика.", secondary: true));
+        grid.CellValueChanged += (_, e) =>
+        {
+            if (changing || e.RowIndex < 0 || e.ColumnIndex is not (2 or 3) || grid.Rows[e.RowIndex].Tag is not AppRule rule) return;
+            var row = grid.Rows[e.RowIndex]; var next = rule with { Vpn = row.Cells[2].Value?.ToString() == "Через VPN", IncludeFolder = row.Cells[3].Value is true };
+            try { Configuration.AppPattern(next); var index = store.Settings.Apps.IndexOf(rule); store.Settings.Apps[index] = next; row.Tag = next; Changed(); Selection(); }
+            catch (ArgumentException error) { changing = true; row.Cells[3].Value = rule.IncludeFolder; changing = false; ShowError(error.Message); }
+        };
+        panel.Controls.Add(grid); panel.Controls.Add(pathLabel); Selection();
+        var remove = Button("Удалить правило", () => { if (grid.SelectedRows.Count > 0 && grid.SelectedRows[0].Tag is AppRule rule) { store.Settings.Apps.Remove(rule); Changed(); ShowPage("Приложения"); } }); remove.Enabled = store.Settings.Apps.Count > 0; panel.Controls.Add(remove);
+        panel.Controls.Add(Label(store.Settings.Apps.Count == 0 ? "Здесь появятся твои правила. Добавь .exe или ярлык — BorisRay найдёт настоящую программу." : "«Подпапки» включает все .exe в папке приложения и ниже. Отдельное правило точного .exe имеет приоритет.", secondary: true));
     }
     private void AddApplication()
     {
@@ -209,7 +262,8 @@ internal sealed class MainWindow : Form
             var folder = new CheckBox { Text = "Также .exe в этой папке и её подпапках", AutoSize = true, Margin = new Padding(0, 0, 0, 12) }; body.Controls.Add(folder);
             bool vpn = false; body.Controls.Add(Row(Button("Напрямую", () => { dialog.DialogResult = DialogResult.OK; dialog.Close(); }, true), Button("Через VPN", () => { vpn = true; dialog.DialogResult = DialogResult.OK; dialog.Close(); }), Button("Отмена", () => dialog.Close()))); dialog.Controls.Add(body);
             if (dialog.ShowDialog(this) != DialogResult.OK) return;
-            store.Settings.Apps.RemoveAll(a => a.Path.Equals(path, StringComparison.OrdinalIgnoreCase)); store.Settings.Apps.Add(new AppRule(path, vpn, folder.Checked)); Changed(); ShowPage("Приложения");
+            var rule = new AppRule(path, vpn, folder.Checked); Configuration.AppPattern(rule);
+            store.Settings.Apps.RemoveAll(a => a.Path.Equals(path, StringComparison.OrdinalIgnoreCase)); store.Settings.Apps.Add(rule); Changed(); ShowPage("Приложения");
         }
         catch (Exception e) { ShowError(e.Message); }
     }
@@ -225,19 +279,23 @@ internal sealed class MainWindow : Form
     }
     private void SitesPage()
     {
-        var panel = Screen("Сайты"); panel.Controls.Add(Label("Правило действует для домена и поддоменов. Более точный домен имеет приоритет над общим доменом и правилами приложений.", secondary: true));
-        var input = new TextBox { Width = 330, BackColor = Input, ForeColor = TextColor, PlaceholderText = "Например, gosuslugi.ru", AccessibleName = "Домен сайта", Margin = new Padding(0, 4, 12, 8) };
-        var vpn = false; var route = Combo(["Напрямую", "Через VPN"], "Напрямую", value => vpn = value == "Через VPN", 160);
-        var add = Button("Добавить", () => { try { store.Settings.Sites[Profiles.Domain(input.Text)] = vpn; Changed(); ShowPage("Сайты"); } catch (ArgumentException e) { ShowError(e.Message); } }, true); add.Enabled = false; input.TextChanged += (_, _) => add.Enabled = !string.IsNullOrWhiteSpace(input.Text); panel.Controls.Add(Row(input, route, add));
-        var grid = Grid("Домен", "Маршрут"); grid.ReadOnly = true;
-        foreach (var rule in store.Settings.Sites.OrderBy(x => x.Key)) grid.Rows.Add(rule.Key, rule.Value ? "Через VPN" : "Напрямую");
-        panel.Controls.Add(grid); panel.Controls.Add(Button("Удалить выбранное правило", () => { if (grid.SelectedRows.Count > 0) { store.Settings.Sites.Remove(grid.SelectedRows[0].Cells[0].Value!.ToString()!); Changed(); ShowPage("Сайты"); } }));
+        var panel = Screen("Сайты"); panel.Controls.Add(Label("Домен и все его поддомены идут по выбранному маршруту. Более точный домен имеет приоритет, затем — правила приложений.", secondary: true));
+        var input = new TextBox { Width = 300, BackColor = Input, ForeColor = TextColor, PlaceholderText = "Домен или ссылка на сайт", AccessibleName = "Домен или ссылка на сайт", Margin = new Padding(0, 4, 12, 8) };
+        var vpn = false; var route = Combo(["Напрямую", "Через VPN"], "Напрямую", value => vpn = value == "Через VPN", 150);
+        var add = Button("Добавить", () => { try { var domain = input.Text.Trim(); if (Uri.TryCreate(domain, UriKind.Absolute, out var uri) && uri.Scheme is "https" or "http") domain = uri.IdnHost; store.Settings.Sites[Profiles.Domain(domain)] = vpn; Changed(); ShowPage("Сайты"); } catch (ArgumentException e) { ShowError(e.Message); } }, true); add.Enabled = false; input.TextChanged += (_, _) => add.Enabled = !string.IsNullOrWhiteSpace(input.Text); panel.Controls.Add(Row(input, route, add));
+        var grid = Grid("Домен", "Маршрут"); grid.Height = 300; grid.Columns[0].ReadOnly = true;
+        grid.Columns.RemoveAt(1); grid.Columns.Add(new DataGridViewComboBoxColumn { HeaderText = "Маршрут", Name = "Маршрут", DataSource = new[] { "Напрямую", "Через VPN" }, FlatStyle = FlatStyle.Flat });
+        foreach (var rule in store.Settings.Sites.OrderBy(x => x.Key)) { var i = grid.Rows.Add(rule.Key, rule.Value ? "Через VPN" : "Напрямую"); grid.Rows[i].Tag = rule.Key; }
+        grid.CurrentCellDirtyStateChanged += (_, _) => { if (grid.IsCurrentCellDirty) grid.CommitEdit(DataGridViewDataErrorContexts.Commit); };
+        grid.CellValueChanged += (_, e) => { if (e.RowIndex < 0 || e.ColumnIndex != 1 || grid.Rows[e.RowIndex].Tag is not string domain) return; store.Settings.Sites[domain] = grid.Rows[e.RowIndex].Cells[1].Value?.ToString() == "Через VPN"; Changed(); };
+        panel.Controls.Add(grid); var remove = Button("Удалить правило", () => { if (grid.SelectedRows.Count > 0) { store.Settings.Sites.Remove(grid.SelectedRows[0].Cells[0].Value!.ToString()!); Changed(); ShowPage("Сайты"); } }); remove.Enabled = store.Settings.Sites.Count > 0; panel.Controls.Add(remove);
+        if (store.Settings.Sites.Count == 0) panel.Controls.Add(Label("Отдельных правил пока нет. Все сайты используют общий маршрут.", secondary: true));
     }
     private void ConnectionsPage()
     {
         var panel = Screen("Соединения"); connectionsStatus = Label(engine.Running ? "Получаю соединения…" : "VPN выключен. Активных соединений нет.", secondary: true); panel.Controls.Add(connectionsStatus);
-        connections = Grid("Процесс", "Сайт / IP", "Сеть", "Маршрут", "Получено", "Отправлено"); connections.ReadOnly = true; connections.Height = 430; panel.Controls.Add(connections);
-        var detail = new TextBox { Multiline = true, ReadOnly = true, Width = 780, Height = 110, BackColor = Input, ForeColor = TextColor, ScrollBars = ScrollBars.Vertical, AccessibleName = "Подробности выбранного соединения" };
+        connections = Grid("Процесс", "Сайт / IP", "Сеть", "Маршрут", "Получено", "Отправлено"); connections.ReadOnly = true; connections.Height = 300; panel.Controls.Add(connections);
+        var detail = new TextBox { Multiline = true, ReadOnly = true, Width = 780, Height = 100, BackColor = Input, ForeColor = TextColor, ScrollBars = ScrollBars.Vertical, AccessibleName = "Подробности выбранного соединения" };
         connections.SelectionChanged += (_, _) => { if (connections.SelectedRows.Count > 0 && connections.SelectedRows[0].Tag is JsonObject row) detail.Text = Details(row); }; panel.Controls.Add(detail);
         panel.Controls.Add(Label("Обновляется раз в две секунды. Очень короткие соединения могут не попасть в таблицу. «Напрямую» означает выход через провайдера; правило выполняется внутри локального туннеля.", secondary: true)); RenderConnections();
     }
@@ -263,14 +321,16 @@ internal sealed class MainWindow : Form
     private void AboutPage()
     {
         var panel = Screen("О приложении"); panel.Controls.Add(Label("BorisRay 0.1.0 · Windows x64", 16, true));
-        panel.Controls.Add(Label("Личный клиент семейного BorisHub. Подписка шифруется средствами Windows (DPAPI); она доступна только этой учётной записи. Администраторские ключи семьи в клиент не входят.", secondary: true));
-        panel.Controls.Add(Label("Обновления с BorisHub", 14, true));
+        panel.Controls.Add(Label("Бесплатный клиент для твоих VPN-подписок", 14, true));
+        panel.Controls.Add(Label("Подключай своих провайдеров: HTTPS-подписки, списки ссылок и текстовые файлы с VLESS Reality / Hysteria2. Другие протоколы, JSON и Clash YAML пока не поддерживаются.", secondary: true));
+        panel.Controls.Add(Label("Подписка хранится на этом компьютере и шифруется средствами Windows. Клиент не содержит готовых доступов к VPN-сервису.", secondary: true));
+        panel.Controls.Add(Label("Обновления BorisRay", 14, true));
         var updateStatus = Label("Проверка доступна вручную. Новая версия устанавливается распаковкой архива после закрытия приложения.", secondary: true); panel.Controls.Add(updateStatus);
         panel.Controls.Add(Button("Проверить обновления", () => _ = RunAsync(async () => { var update = await Transfers.UpdateAsync(); if (update.Version <= new Version(0, 1, 0)) updateStatus.Text = "Установлена последняя версия"; else { updateStatus.Text = "Доступна версия " + update.Version; panel.Controls.Add(Button("Скачать обновление", () => OpenUrl(update.Download.AbsoluteUri), true)); } })));
         panel.Controls.Add(Button("Исходники BorisRay", () => OpenUrl(Transfers.UpdatesBase + "BorisRay-Windows-0.1.0-source.zip")));
         panel.Controls.Add(Button("Лицензии и авторы", () => OpenFile(Path.Combine(AppContext.BaseDirectory, "LICENSES.txt"))));
         panel.Controls.Add(Button("Сохранить диагностику…", SaveDiagnostics));
-        panel.Controls.Add(Label("Ядро sing-box 1.14.3, © nekohasekai и участники SagerNet, GPLv3+. Личная модификация, без связи с авторами исходного проекта. Подпись издателя Windows для этой персональной сборки не выпускалась.", secondary: true));
+        panel.Controls.Add(Label("Ядро sing-box 1.14.3, © nekohasekai и участники SagerNet, GPLv3+. Независимый клиент, без связи с авторами исходного проекта. Подпись издателя Windows для этой персональной сборки не выпускалась.", secondary: true));
     }
     private static void OpenUrl(string url) => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     private static void OpenFile(string path) => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
@@ -310,8 +370,8 @@ internal sealed class MainWindow : Form
         if (apply != null) { apply.Visible = running && dirty; apply.Enabled = !busy; }
         if (import != null) import.Enabled = !busy;
         if (refresh != null) refresh.Enabled = !busy && !string.IsNullOrWhiteSpace(store.Profile?.Source);
-        if (speed != null) { speed.Text = measurement != null ? "Отменить замер" : "Измерить скорость"; speed.Enabled = !busy && store.Nodes.Count > 0; }
-        if (pendingLabel != null) { pendingLabel.Text = dirty ? running ? "Правила сохранены. Нажми «Применить маршруты», чтобы переподключиться." : "Правила применятся при следующем подключении." : ""; }
+        if (speed != null) { speed.Text = measurement != null ? "Отменить замер" : "Измерить"; speed.Enabled = !busy && store.Nodes.Count > 0; }
+        if (pendingLabel != null) { pendingLabel.Visible = dirty; pendingLabel.Text = dirty ? running ? "Правила сохранены. Нажми «Применить маршруты», чтобы переподключиться." : "Правила применятся при следующем подключении." : ""; }
     }
     private async Task PollAsync()
     {
