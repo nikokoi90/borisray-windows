@@ -1,0 +1,20 @@
+BorisRay Windows client — personal BorisHub family client, 2026.
+Client source: GNU GPL version 3 or later; see LICENSE and licenses/GPL-3.0.txt.
+No affiliation with or endorsement by SagerNet, Amnezia, Microsoft or Apple.
+
+sing-box 1.14.3: Copyright (C) 2022 nekohasekai and contributors; GPLv3+.
+Official unmodified Windows amd64 release with libcronet.dll; upstream notice in core/LICENSE and licenses/sing-box.txt.
+Upstream: https://github.com/SagerNet/sing-box/tree/v1.14.3
+Pinned source commit: 7054cac5124465ffdb145870d7c01885566711b1
+Official build instructions: https://sing-box.sagernet.org/installation/build-from-source/
+Cronet/Chromium third-party notices: licenses/cronet-NOTICE (from the matching upstream module).
+
+.NET runtime and Windows Forms: MIT, Microsoft and contributors.
+Full runtime and Windows Forms licenses/notices are in licenses/.
+
+Original BorisRay golden manta: approved project asset; provenance and generation prompt in assets/PROVENANCE.md in the source archive.
+
+Complete client source, build script and corresponding upstream core source:
+https://fv1.borishub.com/downloads/borisray/windows/BorisRay-Windows-0.1.0-source.zip
+Client repository: https://github.com/nikokoi90/borisray-windows
+Source is provided alongside this release; no private subscription or signing key is included.

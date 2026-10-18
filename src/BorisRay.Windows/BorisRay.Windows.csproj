@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms><EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><ApplicationManifest>app.manifest</ApplicationManifest><ApplicationIcon>../../assets/BorisRay.ico</ApplicationIcon>
+    <AssemblyName>BorisRay</AssemblyName><RootNamespace>BorisRay.Windows</RootNamespace><Version>0.1.0</Version><RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained><PublishSingleFile>false</PublishSingleFile><PublishTrimmed>false</PublishTrimmed><DebugType>none</DebugType><Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../BorisRay.Core/BorisRay.Core.csproj" /><EmbeddedResource Include="../../assets/borisray.png" LogicalName="BorisRay.Icon.png" /></ItemGroup>
+</Project>

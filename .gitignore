@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+vendor/
+artifacts/
+publish/
+config-checks/
+*.log
+*.user
+*.pfx
+*.key
+*.secret
+.DS_Store
