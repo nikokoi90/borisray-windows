@@ -53,6 +53,8 @@ internal static class Capture
                     window.ClientSize = new Size(1100, 780); window.ShowPage(pair.Item1); Snap(window, pair.Item2 + "-desktop");
                     window.ClientSize = new Size(930, 640); window.ShowPage(pair.Item1); Snap(window, pair.Item2 + "-compact");
                 }
+                window.ShowPage("Подключение"); window.ClientSize = new Size(1100, 780);
+                SendMessage(window.Handle, 0x127, 0x10002, 0); Descendants(window).OfType<Button>().Single(b => b.Text == "Подключить VPN").Focus(); Snap(window, "connection-keyboard");
                 window.ShowPage("Сайты");
                 var sites = Descendants(window).OfType<DataGridView>().Single(); sites.Rows[0].Cells[1].Value = "Через VPN";
                 if (!reopened.Settings.Sites["gosuslugi.ru"]) throw new Exception("Native site route edit failed");
@@ -96,6 +98,7 @@ internal static class Capture
             captures.Add(new { name, bitmap.Width, bitmap.Height, sampledColors = distinct.Count, dpi = window.DeviceDpi });
         }
     }
+    [DllImport("user32.dll")] private static extern IntPtr SendMessage(IntPtr window, uint message, int wParam, int lParam);
     private static IEnumerable<Control> Descendants(Control parent)
     { foreach (Control child in parent.Controls) { yield return child; foreach (var nested in Descendants(child)) yield return nested; } }
     private static void Finish(MainWindow window)

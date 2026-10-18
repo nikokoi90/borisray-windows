@@ -36,7 +36,7 @@ internal sealed class MainWindow : Form
         store = isolatedStore ?? new PrivateStore();
         this.captureOnly = captureOnly;
         Text = captureOnly ? "BorisRay — тестовые данные · VPN отключён" : "BorisRay"; ClientSize = new Size(1100, 780); MinimumSize = new Size(930, 640);
-        BackColor = Ground; ForeColor = TextColor; Font = new Font("Segoe UI", 10); AutoScaleMode = AutoScaleMode.Dpi;
+        BackColor = Ground; ForeColor = TextColor; Font = new Font("Segoe UI", 10); AutoScaleDimensions = new SizeF(96, 96); AutoScaleMode = AutoScaleMode.Dpi;
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath); StartPosition = FormStartPosition.CenterScreen;
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BorisRay.Icon.png")!;
         using var original = Image.FromStream(stream); logo = new Bitmap(original);
@@ -96,7 +96,7 @@ internal sealed class MainWindow : Form
         try
         {
             panel.SuspendLayout();
-            var viewport = Math.Min(content.ClientSize.Width, Math.Max(240, Width - 232 - SystemInformation.FrameBorderSize.Width * 2 - 16));
+            var viewport = Math.Min(content.ClientSize.Width, Math.Max(240, Width - Controls.Cast<Control>().Where(c => c.Dock == DockStyle.Left).Sum(c => c.Width) - SystemInformation.FrameBorderSize.Width * 2 - 16));
             var available = Math.Max(240, viewport - panel.Padding.Horizontal - 8);
             void Fit(Control child, int width)
             {
@@ -142,7 +142,7 @@ internal sealed class MainWindow : Form
             var flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | (TextAlign == ContentAlignment.MiddleLeft ? TextFormatFlags.Left : TextFormatFlags.HorizontalCenter);
             if (TextAlign == ContentAlignment.MiddleLeft) { bounds.X += 16; bounds.Width -= 24; }
             TextRenderer.DrawText(e.Graphics, Text, Font, bounds, ink, flags);
-            if (Focused && ShowFocusCues) { using var focus = new Pen(Gold, 2) { DashStyle = DashStyle.Dot }; e.Graphics.DrawRectangle(focus, 4, 4, Width - 9, Height - 9); }
+            if (Focused && ShowFocusCues) { using var focus = new Pen(BackColor == Gold ? Ground : Gold, 2) { DashStyle = DashStyle.Dot }; e.Graphics.DrawRectangle(focus, 4, 4, Width - 9, Height - 9); }
         }
     }
     private static FlowLayoutPanel Field(string title, Control input)
