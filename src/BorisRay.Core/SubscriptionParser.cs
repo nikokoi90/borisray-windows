@@ -217,7 +217,15 @@ public static class SubscriptionParser
     {
         if (value.Length == 0) return;
         if (!Regex.IsMatch(value, "^[0-9,:-]+$")) throw Fail("Некорректный диапазон портов.");
-        n["server_ports"] = new JsonArray(value.Split(',').Select(p => (JsonNode?)JsonValue.Create(p.Replace('-', ':'))).ToArray());
+        var ranges = new JsonArray();
+        foreach (var part in value.Split(','))
+        {
+            var ends = part.Replace('-', ':').Split(':');
+            if (ends.Length is < 1 or > 2 || !int.TryParse(ends[0], out var first) || first is < 1 or > 65535 ||
+                !int.TryParse(ends[^1], out var last) || last < first || last > 65535) throw Fail("Некорректный диапазон портов.");
+            ranges.Add($"{first}:{last}");
+        }
+        n["server_ports"] = ranges;
     }
 
     private static void ReadJson(JsonNode json, List<Node> result)

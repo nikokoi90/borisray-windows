@@ -34,6 +34,8 @@ internal static class SubscriptionChecks
         check(configs[0][0].Outbound["transport"]?["headers"]?["Host"]?.ToString() == "cdn.example", "WebSocket Host preserved");
         check(configs[5][0].Outbound["transport"]?["path"]?.ToString() == "/socket" && configs[5][0].Outbound["transport"]?["max_early_data"]?.ToString() == "2048", "VMess early-data mapping preserves transport semantics");
         check(configs[10][0].Outbound["password"]?.ToString() == "synthetic:password" && configs[10][0].Channel == "udp", "Hysteria2 userpass and UDP channel");
+        check(configs[10][0].Outbound["server_ports"]?[0]?.ToString() == "443:443" && configs[10][0].Outbound["server_ports"]?[1]?.ToString() == "4500:4510", "single and ranged Hysteria2 ports use core range syntax");
+        reject(() => Profiles.Parse(links[10].Replace("4500-4510", "70000-70001")), "out-of-range hopping port rejected before persistence");
         configs.Add(Profiles.Parse(Url64("#profile-title: Synthetic provider\n" + string.Join('\n', links))));
         check(configs[^1].Count == links.Length, "URL-safe unpadded Base64 and metadata comments");
         check(SubscriptionParser.Input("happ://add/https%3A%2F%2Fprovider.example%2Fsubscription%3Ftoken%3Dsynthetic") == "https://provider.example/subscription?token=synthetic", "plain Happ add wrapper extracts exact subscription URL");
