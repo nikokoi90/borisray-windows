@@ -1,0 +1,24 @@
+{
+  "verdict": {
+    "mode": "Scoring pass on the single prior material fix; no new full-surface review.",
+    "fixes": [
+      {
+        "id": "route-apply-lifecycle",
+        "status": "resolved",
+        "evidence": "Apps and Sites now visibly say 'Правила применятся при следующем подключении.' in both offline-pending captures. All four running-pending desktop/compact captures show 'Правила сохранены. Нажми «Применить маршруты», чтобы переподключиться.' and a clearly visible Apply routes button above the rule table. Guidance is on the editing page, rather than requiring the user to discover it on Connection.",
+        "source_verification": "MainWindow.cs:228-239 defines the shared PendingRoutes and guarded capture-only state fixture; AppsPage at 244 and SitesPage at 304 install the shared controls. The Apply routes handler performs engine.StopAsync() followed by StartAsync(). Changed() persists settings and marks dirty; UpdateState() retains the explanation while dirty, uses offline versus running wording and enables Apply when appropriate. StartAsync at 194-197 clears dirty only after validation and engine startup succeed. The action and successful-clear lifecycle are source-verified, not physically exercised against Windows TUN.",
+        "capture_validity": "All 20 required images were reopened and visually inspected: the same 14 prior paths plus apps-pending-offline.png, apps-pending-running-desktop.png, apps-pending-running-compact.png, sites-pending-offline.png, sites-pending-running-desktop.png and sites-pending-running-compact.png. Each exists, is nonblank, shows its named view and has sensible measured dimensions. Added pending UI remains readable at desktop and compact sizes; native vertical scrolling retains lower app details and deletion controls.",
+        "truth_of_fixtures": "The four running-pending screenshots explicitly label their window title as an active-VPN test without network connection. native-capture.json identifies simulated running-pending UI and no VPN start. The fixture method rejects use outside captureOnly. These are valid evidence of the pending-state interface, not evidence of a real connected tunnel.",
+        "build_evidence": "ci.json records success for source commit 28083d27d8815314b89bc42e1002ebbd5334e598 and run https://github.com/nikokoi90/borisray-windows/actions/runs/39163702461, with 30 portable and four official Windows core checks. native-capture.json reports pending-guidance assertions passed offline and in simulated connected UI. The final candidate zip at BorisRay-Windows-x64-0.1.0.zip (verified local CI artifact) exists and contains BorisRay.exe and the pinned engine. The reviewer read this evidence rather than rerunning those checks."
+      }
+    ],
+    "regressions_introduced_by_fix": []
+  },
+  "remaining": {
+    "status": "clear",
+    "open_scored_material_fixes": [],
+    "limitations": "Physical Windows 11 TUN startup, actual reconnect and route behavior, live connection rows, latency/throughput, and high-DPI rendering remain unverified. Captures are actual native WinForms DrawToBitmap at 96 DPI on the standard GitHub Windows runner; no TUN or real VPN was started.",
+    "scope": "This ship verdict covers the scored fix, not the whole surface."
+  },
+  "disposition": "ship"
+}

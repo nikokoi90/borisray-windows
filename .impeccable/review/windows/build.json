@@ -1,0 +1,9 @@
+{
+  "sha256": "c1b716b81bb21180efec1a8183510eac4a34be1913acdce14f081ecd849f4802",
+  "platform": "win-x64",
+  "version": "0.1.0",
+  "os": "Microsoft Windows 10.0.26100",
+  "core": "1.14.3",
+  "size": 84757656,
+  "commit": "28083d27d8815314b89bc42e1002ebbd5334e598"
+}

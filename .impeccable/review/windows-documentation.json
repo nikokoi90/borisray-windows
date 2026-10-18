@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "role": "impeccable_documenter",
+  "status": "pass within documentation scope",
+  "scope": "First Windows-only native design baseline; no UI, PRODUCT, Mac, other project or memory modification.",
+  "source": {
+    "revision": "28083d27d8815314b89bc42e1002ebbd5334e598",
+    "files": [
+      "src/BorisRay.Windows/MainWindow.cs",
+      "src/BorisRay.Windows/Program.cs",
+      "src/BorisRay.Windows/BorisRay.Windows.csproj"
+    ],
+    "brandAsset": "assets/borisray.png",
+    "brief": [
+      "PRODUCT.md",
+      ".impeccable/surfaces/windows.md"
+    ]
+  },
+  "written": [
+    "DESIGN.md",
+    ".impeccable/design.json",
+    ".impeccable/review/windows-documentation.json"
+  ],
+  "evidence": {
+    "capturesPersonallyInspected": [
+      ".impeccable/review/windows/connection-desktop.png",
+      ".impeccable/review/windows/apps-compact.png",
+      ".impeccable/review/windows/import-dialog.png",
+      ".impeccable/review/windows/connection-keyboard.png",
+      ".impeccable/review/windows/apps-pending-offline.png",
+      ".impeccable/review/windows/apps-pending-running-desktop.png",
+      ".impeccable/review/windows/apps-pending-running-compact.png",
+      ".impeccable/review/windows/sites-pending-offline.png",
+      ".impeccable/review/windows/sites-pending-running-desktop.png",
+      ".impeccable/review/windows/sites-pending-running-compact.png"
+    ],
+    "packetCaptureCount": 20,
+    "dpi": 96,
+    "method": "Actual WinForms DrawToBitmap on standard GitHub Windows runner; isolated synthetic fixtures; running-pending fixtures explicitly simulated and named in title bar; no VPN started.",
+    "reportedChecks": "Final CI reports success, 30 portable checks and four core configuration checks. The native packet reports DPAPI, staging ACL, owned-child cleanup, shortcut resolution, rule editing, masked import and offline/simulated-connected pending guidance passed. Documenter read those results and did not rerun them.",
+    "finishReview": ".impeccable/review/windows-finish-review.json",
+    "pendingFix": "PendingRoutes() on Applications/Sites, stop/start apply command and stopped/running guidance are present in source 28083d2. Documenter personally inspected all six new pending views: offline next-connection guidance and the simulated-running reconnect action are visible; compact views preserve those controls with native vertical scrolling. These fixtures are UI-state evidence only, with no real TUN.",
+    "nativePacket": ".impeccable/review/windows/native-capture.json",
+    "ci": ".impeccable/review/windows/ci.json",
+    "captureRevision": "28083d27d8815314b89bc42e1002ebbd5334e598",
+    "ciRun": "https://github.com/nikokoi90/borisray-windows/actions/runs/39163702461",
+    "finishVerdict": ".impeccable/review/windows-finish-verdict.json",
+    "finishVerdictScope": "Fresh scoring pass on the sole prior material route-apply-lifecycle fix; resolved, no fix-introduced regressions, disposition ship. Reviewer reopened all 20 captures. This verdict is not a new full-surface review.",
+    "packaging": {
+      "artifact": "BorisRay-Windows-x64-0.1.0.zip",
+      "bytes": 84757656,
+      "sha256": "c1b716b81bb21180efec1a8183510eac4a34be1913acdce14f081ecd849f4802",
+      "verification": "Documenter independently read the staged final file and verified its byte count and SHA256; basename only retained here to avoid private absolute paths."
+    }
+  },
+  "validation": {
+    "frontmatter": "passed Ruby YAML parsing, documented token-group/property checks, all token-reference resolution and canonical section order",
+    "sidecar": "passed JSON parsing and schema-v2 structural checks against reference/document.md, metadata/frontmatter alignment, component kind/reference/scope/state checks and verbatim narrative mapping",
+    "officialExternalSchemaValidatorRun": false,
+    "htmlCssDetectorRun": false,
+    "reason": "Canonical implementation is native C# Windows Forms; HTML/CSS snippets are self-contained panel illustrations only.",
+    "implementedPrimitiveCount": {
+      "colors": 11,
+      "typography": 7,
+      "rounded": 1,
+      "spacing": 7,
+      "components": 9
+    },
+    "panelSpecimenCount": 8,
+    "designSha256": "85525a75e362db1d64bf0e5e934fae4c8024be402dffb67cfbc53e53275a0354",
+    "sidecarSha256": "7a4d13e8ee99ba16538cfa5cecdc1ca3c8aeaaeb7c0e81944bc862b73c8e5dc9",
+    "finalEvidenceConsistency": "passed final source/capture revision match, 20-view packet count, six personally inspected pending fixtures, synthetic-state/TUN boundary, verbatim overview mapping and content SHA256 checks"
+  },
+  "translationLimits": [
+    "Frontmatter owns all primitive tokens; sidecar contains metadata, narrative and specimens.",
+    "Eight-step OKLCH tonal ramps are synthesized panel visualizations and are not implemented palette tokens.",
+    "HTML uses native browser field/select chrome as an illustration of native Windows controls; it is not a pixel-equivalent capture.",
+    "CSS brightness illustrates native ControlPaint.Light/Dark feedback; exact hover/pressed raster colors remain C# behavior.",
+    "No card or chip component exists in the native build, so none is invented.",
+    "The north-star label describes the inherited approved gold manta identity; it does not introduce a new visual-world decision."
+  ],
+  "notCanonizedOrRepaired": {
+    "materialFinding": "route-apply-lifecycle is corrected in source and the six final native pending captures; fresh reviewer marks it resolved with disposition ship, scoped to that fix.",
+    "lowerPriorityObservation": "The application-route chooser has visible Cancel/native close controls but no explicit Escape CancelButton binding; this pre-existing interaction limitation is not a system rule and was not changed by documentation.",
+    "unverified": [
+      "physical Windows 11 TUN, actual reconnection and real route behavior",
+      "high-DPI appearance",
+      "actual throughput, latency and connection monitoring under traffic",
+      "running/busy/error rendered states beyond explicitly labeled synthetic pending fixtures"
+    ]
+  },
+  "acceptanceBoundary": "Documentation of source and supplied native visual evidence only; no physical-network acceptance, browser acceptance, broad audit or security certification.",
+  "finalizedAt": "2026-10-18T20:36:02Z"
+}

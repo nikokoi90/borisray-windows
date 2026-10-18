@@ -1,0 +1,108 @@
+{
+  "disposition": "fix",
+  "persistence": {
+    "status": "pass",
+    "input_note": "No separate QUALITY BAR card, approved comp, comp-diff packet, or Windows-specific platform reference was supplied. This is an ordinary refinement of an inherited native world; the provided surface brief contains its quality bar, and a new concept roll, seed, comp approval, or comp build state is not applicable.",
+    "product": "PRODUCT.md exists and records the Windows-only, free, provider-neutral client, supported protocols, inherited brand, and outstanding physical Windows routing acceptance.",
+    "direction": ".impeccable/surfaces/windows.md records the inherited composition, exact palette, first viewport, native control conventions, quality bar, and signature interaction.",
+    "evidence": {
+      "status": "pass",
+      "captures_inspected": [
+        "windows/connection-desktop.png",
+        "windows/connection-compact.png",
+        "windows/connection-empty.png",
+        "windows/apps-desktop.png",
+        "windows/apps-compact.png",
+        "windows/sites-desktop.png",
+        "windows/sites-compact.png",
+        "windows/connections-desktop.png",
+        "windows/connections-compact.png",
+        "windows/about-desktop.png",
+        "windows/about-compact.png",
+        "windows/import-dialog.png",
+        "windows/app-rule-dialog.png",
+        "windows/connection-keyboard.png"
+      ],
+      "capture_validity": "All 14 required captures exist, are nonblank, show the named native view from its top, and have sensible measured dimensions: desktop 1044x788, compact 946x679, import 620x260, app-rule 620x270. Compact forms have a visible native vertical scrollbar rather than horizontal overflow. Dark empty table areas are intentional empty states.",
+      "provenance": "native-capture.json records actual WinForms DrawToBitmap on a standard GitHub Windows runner at 96 DPI, synthetic fixtures, and no VPN start. Main capture titles explicitly label test data and VPN off. The supplied compiled zip exists and contains the Windows distribution.",
+      "reported_validation": "ci.json records success for commit 8e669db462cc81ee13df3cdbdfedd357f2e513c2, 30 portable checks and four core configuration checks. native-capture.json records DPAPI, staging ACL, owned-child cleanup, real shortcut resolution, rule editing and masked-import checks as passed. These checks were read, not rerun by this reviewer.",
+      "limits": "Running, busy, error, pending and completed-throughput states have source evidence only. Physical Windows 11 TUN, live route behavior, real connection rows, latency and throughput remain unaccepted. No browser or HTML/CSS detector evidence is claimed. Only the provided primary source and packet were reviewed; no general security audit was performed."
+    }
+  },
+  "fidelity": {
+    "basis": "No approved comp governs this inherited refinement. The visual inventory was inspected before reading the direction brief: fixed quiet sidebar, original gold manta raster, English serif wordmark, dark main field, dominant gold connection action and adjacent state, paired native fields, directly editable route tables, and restrained secondary actions.",
+    "element_matrix": [
+      {
+        "element": "TYPE",
+        "state": "match",
+        "evidence": "Gold Georgia bold BorisRay lettering retains the inherited serif brand. Segoe UI headings, table headers and body controls are an explicit native Windows choice in SYSTEM; the platform face is not substituted for the brand display voice. Heading and action hierarchy is clear at both captured sizes."
+      },
+      {
+        "element": "MATERIAL",
+        "state": "match",
+        "evidence": "The original dimensional gold manta raster is visibly present at useful contrast and scale. The surrounding interface is deliberately flat native utility UI, with no invented metal, glass, texture, CSS imitation or buried asset."
+      },
+      {
+        "element": "GROUND",
+        "state": "match",
+        "evidence": "Pixel samples from connection-desktop.png give main field RGB 16,16,20 (#101014), sidebar 25,25,30 (#19191E), and gold action 241,194,125 (#F1C27D), exactly matching SYSTEM. No blue-slate or warm-ground drift is present."
+      },
+      {
+        "element": "Connection composition and first viewport",
+        "state": "match",
+        "evidence": "Connection action and honest off-state lead; subscription count/import follows; country and channel remain paired; server, default route and route-editing links are findable without searching. The empty state disables connect and promotes adding the user's subscription. The memory test retains BorisRay, the gold manta and one obvious connect action."
+      },
+      {
+        "element": "Native resize and keyboard adaptation",
+        "state": "adaptation",
+        "evidence": "Scrollable native forms preserve task order at 946x679; tables and long explanatory text fit the available width. A dotted keyboard focus cue is visible around Connect. Native title bars, controls and scrollbars are acceptable adaptations under SYSTEM's Windows conventions and PRODUCT's Windows port scope. Only 96 DPI rendering is captured; source enables DPI scaling."
+      },
+      {
+        "element": "Application and domain rule editing",
+        "state": "match",
+        "evidence": "Editable route cells, folder checkbox, full selected executable path, native file/running-program selection and domain priority guidance are visible or source-backed. Native-capture.json reports actual rule-cell edits and shortcut resolution. No hidden provider-specific routes are implied by the labeled fixture row."
+      },
+      {
+        "element": "Signature interaction: saved versus applied routes",
+        "state": "contradicted",
+        "evidence": "Apps and Sites say routes use the selected choice but display no pending/apply lifecycle guidance. Changed() saves and marks dirty; Screen() clears pendingLabel; only ConnectionPage() creates the explanatory label and apply action. While a tunnel is running, a rule edit therefore remains unapplied without an explanation on the page where the edit happened."
+      },
+      {
+        "element": "Connection monitoring and measurements",
+        "state": "match",
+        "evidence": "The captured off-state explicitly says there are no active connections. Unmeasured latency and throughput remain dashes. The two-second sampling limit and HTTPS measurement method are disclosed. These are honest unmeasured states, not evidence of actual traffic or performance."
+      },
+      {
+        "element": "Free client and supported subscription truth",
+        "state": "match",
+        "evidence": "BorisHub branding is absent from the visible artifact. Empty and About views explain the user's own provider/subscription, free client, Windows encryption and supported VLESS Reality/Hysteria2 scope. JSON, Clash YAML and other protocols are explicitly unsupported; no bundled server access or family administration is promised."
+      },
+      {
+        "element": "Craft floor",
+        "state": "match",
+        "evidence": "No eyebrow, section numbering, decorative gradient lettering, fake physicality, icon-card grid, hard offset shadow or glyph icon system is present. The power icon is drawn geometry. Native dialogs protect subscription privacy or an executable route choice. Disabled, empty and focused states are visible; hover, pressed, busy and error behavior are source-backed only."
+      }
+    ],
+    "contract_promises": {
+      "THESIS_CONCEPT": "Kept: a free Windows utility for the user's subscriptions, with no provider identity imposed.",
+      "OWN_WORLD_SYSTEM": "Kept: inherited gold manta, gold serif BorisRay wordmark, exact dark field and restrained native utility controls.",
+      "STORY_MODE": "Kept: import, connect, choose routes and inspect connections follow the operating task; no decorative narrative displaces controls.",
+      "FIRST_VIEWPORT": "Kept for captured off and empty states; running/error/pending/throughput renderings are source-only evidence.",
+      "FORM_SIGNATURE": "Partially kept: the connection action follows engine state, but editing pages omit the explicit pending/apply guidance promised by the signature interaction. FORM seed/comp requirements do not apply to this inherited refinement."
+    }
+  },
+  "ceiling": {
+    "status": "reached within the inherited visual world; signature lifecycle remains open",
+    "assessment": "The native utility world has sufficient commitment: persistent frame, recognizable raster mascot, serif brand voice, clear action hierarchy and restrained ornament. Additional depth, ornament or entrance motion would not serve this task. Native focus feedback and scrollable resizing are used. High-DPI and physical Windows 11 rendering remain unverified rather than inferred from the runner. The application route chooser does not explicitly wire Escape through CancelButton; its visible Cancel and native close controls remain available, so this is below material shipping significance for this review."
+  },
+  "material_fixes": [
+    {
+      "id": "route-apply-lifecycle",
+      "priority": "P1",
+      "check": "Contract FORM/signature interaction and truthful operating state",
+      "fix": "Show a persistent pending-state explanation on both Apps and Sites after add/edit/delete: when running, say rules are saved but require reconnection and provide an obvious Apply routes action or link to Connection; when stopped, say they apply on next connection. Keep that guidance until successful apply/connect, and recapture both editing pages in the pending state.",
+      "evidence": "src/BorisRay.Windows/MainWindow.cs:72,153,162,228-252,285-297,372-383; apps-desktop.png, apps-compact.png, sites-desktop.png and sites-compact.png contain route precedence guidance but no apply lifecycle."
+    }
+  ],
+  "keep": "Preserve the inherited original gold manta and English serif BorisRay wordmark, exact charcoal/gold palette, dominant stateful connect action, direct native rule editing, provider-neutral import copy and honest unknown measurement states."
+}

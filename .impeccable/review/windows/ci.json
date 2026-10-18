@@ -1,0 +1,9 @@
+{
+  "run": "https://github.com/nikokoi90/borisray-windows/actions/runs/39163702461",
+  "commit": "28083d27d8815314b89bc42e1002ebbd5334e598",
+  "conclusion": "success",
+  "core_configuration_checks": 4,
+  "portable_tests": 30,
+  "physical_Windows11_TUN_tested": false,
+  "running_pending_fixtures_simulated": true
+}

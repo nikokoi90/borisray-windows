@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T20:35:29Z",
+  "title": "Design System: BorisRay for Windows",
+  "extensions": {
+    "colorMeta": {
+      "gold": {
+        "role": "primary",
+        "displayName": "Manta Gold",
+        "tonalRamp": [
+          "oklch(15.00% 0.10201 76.23)",
+          "oklch(26.43% 0.10201 76.23)",
+          "oklch(37.86% 0.10201 76.23)",
+          "oklch(49.29% 0.10201 76.23)",
+          "oklch(60.71% 0.10201 76.23)",
+          "oklch(72.14% 0.10201 76.23)",
+          "oklch(83.57% 0.10201 76.23)",
+          "oklch(95.00% 0.10201 76.23)"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Near-black Ground",
+        "tonalRamp": [
+          "oklch(15.00% 0.00821 285.52)",
+          "oklch(26.43% 0.00821 285.52)",
+          "oklch(37.86% 0.00821 285.52)",
+          "oklch(49.29% 0.00821 285.52)",
+          "oklch(60.71% 0.00821 285.52)",
+          "oklch(72.14% 0.00821 285.52)",
+          "oklch(83.57% 0.00821 285.52)",
+          "oklch(95.00% 0.00821 285.52)"
+        ]
+      },
+      "sidebar": {
+        "role": "neutral",
+        "displayName": "Sidebar Charcoal",
+        "tonalRamp": [
+          "oklch(15.00% 0.00973 285.56)",
+          "oklch(26.43% 0.00973 285.56)",
+          "oklch(37.86% 0.00973 285.56)",
+          "oklch(49.29% 0.00973 285.56)",
+          "oklch(60.71% 0.00973 285.56)",
+          "oklch(72.14% 0.00973 285.56)",
+          "oklch(83.57% 0.00973 285.56)",
+          "oklch(95.00% 0.00973 285.56)"
+        ]
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Input Charcoal",
+        "tonalRamp": [
+          "oklch(15.00% 0.00752 285.83)",
+          "oklch(26.43% 0.00752 285.83)",
+          "oklch(37.86% 0.00752 285.83)",
+          "oklch(49.29% 0.00752 285.83)",
+          "oklch(60.71% 0.00752 285.83)",
+          "oklch(72.14% 0.00752 285.83)",
+          "oklch(83.57% 0.00752 285.83)",
+          "oklch(95.00% 0.00752 285.83)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Warm Text",
+        "tonalRamp": [
+          "oklch(15.00% 0.00740 80.72)",
+          "oklch(26.43% 0.00740 80.72)",
+          "oklch(37.86% 0.00740 80.72)",
+          "oklch(49.29% 0.00740 80.72)",
+          "oklch(60.71% 0.00740 80.72)",
+          "oklch(72.14% 0.00740 80.72)",
+          "oklch(83.57% 0.00740 80.72)",
+          "oklch(95.00% 0.00740 80.72)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Quiet Gray",
+        "tonalRamp": [
+          "oklch(15.00% 0.01263 286.10)",
+          "oklch(26.43% 0.01263 286.10)",
+          "oklch(37.86% 0.01263 286.10)",
+          "oklch(49.29% 0.01263 286.10)",
+          "oklch(60.71% 0.01263 286.10)",
+          "oklch(72.14% 0.01263 286.10)",
+          "oklch(83.57% 0.01263 286.10)",
+          "oklch(95.00% 0.01263 286.10)"
+        ]
+      },
+      "selected": {
+        "role": "neutral",
+        "displayName": "Selected Umber",
+        "tonalRamp": [
+          "oklch(15.00% 0.02977 68.61)",
+          "oklch(26.43% 0.02977 68.61)",
+          "oklch(37.86% 0.02977 68.61)",
+          "oklch(49.29% 0.02977 68.61)",
+          "oklch(60.71% 0.02977 68.61)",
+          "oklch(72.14% 0.02977 68.61)",
+          "oklch(83.57% 0.02977 68.61)",
+          "oklch(95.00% 0.02977 68.61)"
+        ]
+      },
+      "action-border": {
+        "role": "neutral",
+        "displayName": "Action Edge",
+        "tonalRamp": [
+          "oklch(15.00% 0.01351 285.74)",
+          "oklch(26.43% 0.01351 285.74)",
+          "oklch(37.86% 0.01351 285.74)",
+          "oklch(49.29% 0.01351 285.74)",
+          "oklch(60.71% 0.01351 285.74)",
+          "oklch(72.14% 0.01351 285.74)",
+          "oklch(83.57% 0.01351 285.74)",
+          "oklch(95.00% 0.01351 285.74)"
+        ]
+      },
+      "grid-divider": {
+        "role": "neutral",
+        "displayName": "Grid Divider",
+        "tonalRamp": [
+          "oklch(15.00% 0.01198 285.78)",
+          "oklch(26.43% 0.01198 285.78)",
+          "oklch(37.86% 0.01198 285.78)",
+          "oklch(49.29% 0.01198 285.78)",
+          "oklch(60.71% 0.01198 285.78)",
+          "oklch(72.14% 0.01198 285.78)",
+          "oklch(83.57% 0.01198 285.78)",
+          "oklch(95.00% 0.01198 285.78)"
+        ]
+      },
+      "error": {
+        "role": "neutral",
+        "displayName": "Soft Error",
+        "tonalRamp": [
+          "oklch(15.00% 0.11610 19.96)",
+          "oklch(26.43% 0.11610 19.96)",
+          "oklch(37.86% 0.11610 19.96)",
+          "oklch(49.29% 0.11610 19.96)",
+          "oklch(60.71% 0.11610 19.96)",
+          "oklch(72.14% 0.11610 19.96)",
+          "oklch(83.57% 0.11610 19.96)",
+          "oklch(95.00% 0.11610 19.96)"
+        ]
+      },
+      "error-ground": {
+        "role": "neutral",
+        "displayName": "Error Ground",
+        "tonalRamp": [
+          "oklch(15.00% 0.03502 10.95)",
+          "oklch(26.43% 0.03502 10.95)",
+          "oklch(37.86% 0.03502 10.95)",
+          "oklch(49.29% 0.03502 10.95)",
+          "oklch(60.71% 0.03502 10.95)",
+          "oklch(72.14% 0.03502 10.95)",
+          "oklch(83.57% 0.03502 10.95)",
+          "oklch(95.00% 0.03502 10.95)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Wordmark",
+        "purpose": "Georgia bold English BorisRay identity."
+      },
+      "headline": {
+        "displayName": "Page title",
+        "purpose": "Segoe UI bold page heading."
+      },
+      "title": {
+        "displayName": "Section title",
+        "purpose": "Recurring subscription, measurement and About headings."
+      },
+      "status": {
+        "displayName": "Connection status",
+        "purpose": "Prominent state beside the connection action."
+      },
+      "body": {
+        "displayName": "Native body",
+        "purpose": "Controls, explanatory copy, pending guidance and table content."
+      },
+      "label": {
+        "displayName": "Native label",
+        "purpose": "Field labels, table headers and connection action."
+      },
+      "caption": {
+        "displayName": "Footer caption",
+        "purpose": "Version and free-client footer line."
+      }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Gold primary action, minimum 38px height at 96 DPI. Portable HTML specimen of the native control; it is not application code or a Windows capture. CSS brightness illustrates the source ControlPaint.Light/Dark redraw without asserting pixel equivalence.",
+      "html": "<button class=\"ds-action ds-primary\">Добавить приложение…</button>",
+      "css": ".ds-action{font:10pt \"Segoe UI\",sans-serif;border-radius:8px;padding:6px 12px;min-height:38px;border:1px solid #414149;background:#202024;color:#F4F1EC;cursor:pointer}.ds-action:hover:not(:disabled){filter:brightness(1.08)}.ds-action:active:not(:disabled){filter:brightness(.9)}.ds-action:focus-visible{outline:2px dotted #F1C27D;outline-offset:-6px}.ds-action:disabled{background:#202024;color:#B7B7C0;cursor:default}.ds-primary{background:#F1C27D;color:#101014;border:0}.ds-primary:focus-visible{outline-color:#101014}"
+    },
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Charcoal supporting action with a one-pixel painted edge. Portable HTML specimen of the native control; it is not application code or a Windows capture. CSS brightness illustrates the source ControlPaint.Light/Dark redraw without asserting pixel equivalence.",
+      "html": "<button class=\"ds-action\">Из файла…</button>",
+      "css": ".ds-action{font:10pt \"Segoe UI\",sans-serif;border-radius:8px;padding:6px 12px;min-height:38px;border:1px solid #414149;background:#202024;color:#F4F1EC;cursor:pointer}.ds-action:hover:not(:disabled){filter:brightness(1.08)}.ds-action:active:not(:disabled){filter:brightness(.9)}.ds-action:focus-visible{outline:2px dotted #F1C27D;outline-offset:-6px}.ds-action:disabled{background:#202024;color:#B7B7C0;cursor:default}"
+    },
+    {
+      "name": "Connection Action",
+      "kind": "button",
+      "refersTo": "button-connect",
+      "description": "Gold connection action, minimum 208 by 54 native pixels, bold body text, geometric power mark. Portable HTML specimen of the native control; it is not application code or a Windows capture. CSS brightness illustrates the source ControlPaint.Light/Dark redraw without asserting pixel equivalence.",
+      "html": "<button class=\"ds-action ds-primary ds-connect\"><svg class=\"ds-power\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M17.35 5.65a8 8 0 1 1-10.7 0M12 2v9\"/></svg><span>Подключить VPN</span></button>",
+      "css": ".ds-action{font:10pt \"Segoe UI\",sans-serif;border-radius:8px;padding:6px 12px;min-height:38px;border:1px solid #414149;background:#202024;color:#F4F1EC;cursor:pointer}.ds-action:hover:not(:disabled){filter:brightness(1.08)}.ds-action:active:not(:disabled){filter:brightness(.9)}.ds-action:focus-visible{outline:2px dotted #F1C27D;outline-offset:-6px}.ds-action:disabled{background:#202024;color:#B7B7C0;cursor:default}.ds-primary{background:#F1C27D;color:#101014;border:0}.ds-primary:focus-visible{outline-color:#101014}.ds-connect{min-width:208px;min-height:54px;font-weight:700;display:inline-flex;gap:14px;align-items:center;justify-content:center}.ds-power{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}"
+    },
+    {
+      "name": "Masked Subscription Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Native password-masked import field; browser-native border and focus are illustrative, while Windows owns actual field chrome.",
+      "html": "<label class=\"ds-field\">Приватная ссылка подписки<input class=\"ds-input\" type=\"password\" value=\"synthetic-example\" aria-label=\"Приватная ссылка подписки\"/></label>",
+      "css": ".ds-field{display:grid;gap:6px;color:#F4F1EC;font:10pt \"Segoe UI\",sans-serif}.ds-input{width:300px;max-width:100%;background:#202024;color:#F4F1EC;font:10pt \"Segoe UI\",sans-serif;border:2px inset #B7B7C0}.ds-input:focus-visible{outline:auto}.ds-input:hover{cursor:text}"
+    },
+    {
+      "name": "Selection Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Native drop-down-list selector with 27px owner-drawn items and nine-pixel text inset; browser select chrome is a portable stand-in for Windows chrome.",
+      "html": "<label class=\"ds-field\">Канал<select class=\"ds-select\"><option>Авто · TCP + UDP</option><option>TCP · VLESS Reality</option><option>UDP · Hysteria2</option></select></label>",
+      "css": ".ds-field{display:grid;gap:6px;font:700 10pt \"Segoe UI\",sans-serif;color:#F4F1EC}.ds-select{width:270px;max-width:100%;background:#202024;color:#F4F1EC;padding-left:9px;font:400 10pt \"Segoe UI\",sans-serif}.ds-select option{min-height:27px;background:#202024;color:#F4F1EC}.ds-select option:checked{background:#413426}.ds-select:hover{cursor:default}.ds-select:focus-visible{outline:auto}"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-item",
+      "description": "Persistent five-item native navigation; current item uses umber fill and gold text. Portable HTML specimen of the native control; it is not application code or a Windows capture. CSS brightness illustrates the source ControlPaint.Light/Dark redraw without asserting pixel equivalence.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"BorisRay\"><button class=\"ds-action ds-nav-item ds-nav-selected\" aria-current=\"page\">Подключение</button><button class=\"ds-action ds-nav-item\">Приложения</button><button class=\"ds-action ds-nav-item\">Сайты</button><button class=\"ds-action ds-nav-item\">Соединения</button><button class=\"ds-action ds-nav-item\">О приложении</button></nav>",
+      "css": ".ds-action{font:10pt \"Segoe UI\",sans-serif;border-radius:8px;padding:6px 12px;min-height:38px;border:1px solid #414149;background:#202024;color:#F4F1EC;cursor:pointer}.ds-action:hover:not(:disabled){filter:brightness(1.08)}.ds-action:active:not(:disabled){filter:brightness(.9)}.ds-action:focus-visible{outline:2px dotted #F1C27D;outline-offset:-6px}.ds-action:disabled{background:#202024;color:#B7B7C0;cursor:default}.ds-nav{width:198px;padding:12px 16px;background:#19191E;display:grid;gap:8px}.ds-nav-item{width:198px;height:44px;text-align:left;padding-left:16px;background:#19191E;color:#B7B7C0;border:0}.ds-nav-selected{background:#413426;color:#F1C27D}"
+    },
+    {
+      "name": "Editable Application Route",
+      "kind": "custom",
+      "refersTo": "rule-row",
+      "description": "A native DataGridView route row with read-only program/path, an editable route selector and folder checkbox. HTML controls illustrate the editing affordances; native grid behavior and chrome remain canonical.",
+      "html": "<table class=\"ds-rules\"><thead><tr><th>Приложение</th><th>Путь</th><th>Маршрут</th><th>Подпапки</th></tr></thead><tbody><tr class=\"ds-selected\"><td>example.exe</td><td>C:\\Program Files\\Example application\\example.exe</td><td><select class=\"ds-route\" aria-label=\"Маршрут приложения\"><option>Напрямую</option><option>Через VPN</option></select></td><td><input class=\"ds-folder\" type=\"checkbox\" checked aria-label=\"Включая подпапки\"/></td></tr></tbody></table>",
+      "css": ".ds-rules{width:100%;border-collapse:collapse;background:#101014;color:#F4F1EC;font:10pt \"Segoe UI\",sans-serif;text-align:left}.ds-rules th{height:36px;background:#19191E;font-weight:700;padding:0 4px}.ds-rules td{height:40px;padding:4px;border-bottom:1px solid #3C3C43}.ds-rules .ds-selected{background:#413426}.ds-rules td:nth-child(2){max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds-route{background:#413426;color:#F4F1EC;font:inherit;border:0;max-width:140px}.ds-route:hover,.ds-folder:hover{cursor:default}.ds-route:focus-visible,.ds-folder:focus-visible{outline:auto}"
+    },
+    {
+      "name": "Pending Route Guidance",
+      "kind": "custom",
+      "description": "Shared Connection/Applications/Sites saved-versus-applied guidance. Running fixture offers the actual stop/start apply command; stopped text says rules apply at next connection. This specimen represents text and appearance, not tunnel operation. Portable HTML specimen of the native control; it is not application code or a Windows capture. CSS brightness illustrates the source ControlPaint.Light/Dark redraw without asserting pixel equivalence.",
+      "html": "<div class=\"ds-pending\"><p class=\"ds-pending-copy\">Правила сохранены. Нажми «Применить маршруты», чтобы переподключиться.</p><button class=\"ds-action\">Применить маршруты</button></div>",
+      "css": ".ds-action{font:10pt \"Segoe UI\",sans-serif;border-radius:8px;padding:6px 12px;min-height:38px;border:1px solid #414149;background:#202024;color:#F4F1EC;cursor:pointer}.ds-action:hover:not(:disabled){filter:brightness(1.08)}.ds-action:active:not(:disabled){filter:brightness(.9)}.ds-action:focus-visible{outline:2px dotted #F1C27D;outline-offset:-6px}.ds-action:disabled{background:#202024;color:#B7B7C0;cursor:default}.ds-pending{background:#101014;color:#B7B7C0;font:10pt \"Segoe UI\",sans-serif}.ds-pending-copy{margin:0 0 12px;max-width:750px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The inherited gold manta",
+    "overview": "BorisRay keeps the approved original golden manta and English serif wordmark inside a quiet charcoal utility. The image supplies material character; the surrounding controls stay flat, compact and readable. Gold identifies the brand, the active navigation item and the principal action. It is not an all-purpose decoration.\n\nThe Windows expression pairs that existing identity with native Segoe UI text, keyboard focus, selection controls, editable tables and resizable scrolling forms. State and explanatory copy sit beside the affected action. The interface communicates a free client for the user's own subscription without imposing a provider identity.\n\nThis baseline describes `src/BorisRay.Windows/MainWindow.cs` at source revision `28083d2`, with DPI setup in `src/BorisRay.Windows/Program.cs`. The final native capture packet in `.impeccable/review/windows/` contains 20 views at 96 DPI; its `ci.json` identifies the same revision. It establishes the palette, composition, compact layout, keyboard focus and pending-route guidance. The six pending views include explicitly simulated running states without a network connection. Documentation evidence and validation are recorded in `.impeccable/review/windows-documentation.json`. Physical Windows 11 tunnel behavior and high-DPI appearance remain unverified. HTML specimens in the sidecar are portable illustrations of native components, not application code or Windows acceptance evidence.",
+    "keyCharacteristics": [
+      "Original golden manta raster with a gold Georgia wordmark.",
+      "Persistent charcoal sidebar and a flat near-black work area.",
+      "One dominant connection action with adjacent operating state.",
+      "Native fields and direct table editing with visible keyboard focus.",
+      "Saved route changes explained where they are edited."
+    ],
+    "rules": [
+      {
+        "name": "The Gold Anchor Rule",
+        "body": "Keep the inherited gold on the identity, active navigation and principal action; use charcoal secondary actions for supporting operations.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Keep Georgia on the brand wordmark and Segoe UI on operating text and controls.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Utility Rule",
+        "body": "Keep the work area and navigation flat; let tonal separation, selection and native control feedback carry hierarchy.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Saved Versus Applied Rule",
+        "body": "Keep pending guidance on the surface where routes are edited until a successful connection applies the saved configuration.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "**Do** preserve the original golden manta and gold Georgia BorisRay wordmark.",
+      "**Do** use native Segoe UI controls, keyboard focus and table editing for operating tasks.",
+      "**Do** retain one clear principal action and use charcoal for supporting operations.",
+      "**Do** wrap and scroll within the actual available native work area.",
+      "**Do** explain saved route changes on Connection, Applications and Sites until they are applied.",
+      "**Do** keep unknown measurements and inactive connection states explicit."
+    ],
+    "donts": [
+      "**Don't** introduce BorisHub or provider branding into this free client.",
+      "**Don't** redraw the inherited manta as a glyph or decorate operating screens with a card grid.",
+      "**Don't** apply the action radius to native fields and tables.",
+      "**Don't** add decorative shadows or timed entrance motion to the flat utility system.",
+      "**Don't** imply that saving a route has applied it to a running tunnel.",
+      "**Don't** treat synthetic native captures, generated HTML specimens or DPI source settings as physical Windows 11 network or high-DPI acceptance."
+    ]
+  }
+}

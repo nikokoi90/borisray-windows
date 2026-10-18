@@ -1,0 +1,154 @@
+{
+  "os": "Microsoft Windows 10.0.26100",
+  "runtime": ".NET 10.0.13",
+  "method": "Native Windows Forms DrawToBitmap on standard GitHub Windows runner; synthetic fixtures; running-pending UI fixtures explicitly simulated; no VPN started",
+  "dpapiReload": "passed",
+  "protectedSessionAcl": "passed",
+  "ownedChildValidationAndCleanup": "passed",
+  "executableShortcut": "passed",
+  "nativeRuleEditing": "passed",
+  "maskedImportDialog": "passed",
+  "pendingGuidance": "passed offline and simulated connected UI, no real TUN",
+  "captures": [
+    {
+      "name": "connection-desktop",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 119,
+      "dpi": 96
+    },
+    {
+      "name": "connection-compact",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 116,
+      "dpi": 96
+    },
+    {
+      "name": "apps-desktop",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 139,
+      "dpi": 96
+    },
+    {
+      "name": "apps-compact",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 143,
+      "dpi": 96
+    },
+    {
+      "name": "sites-desktop",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 105,
+      "dpi": 96
+    },
+    {
+      "name": "sites-compact",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 108,
+      "dpi": 96
+    },
+    {
+      "name": "connections-desktop",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 113,
+      "dpi": 96
+    },
+    {
+      "name": "connections-compact",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 112,
+      "dpi": 96
+    },
+    {
+      "name": "about-desktop",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 132,
+      "dpi": 96
+    },
+    {
+      "name": "about-compact",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 136,
+      "dpi": 96
+    },
+    {
+      "name": "connection-keyboard",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 119,
+      "dpi": 96
+    },
+    {
+      "name": "apps-pending-offline",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 137,
+      "dpi": 96
+    },
+    {
+      "name": "apps-pending-running-desktop",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 133,
+      "dpi": 96
+    },
+    {
+      "name": "apps-pending-running-compact",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 134,
+      "dpi": 96
+    },
+    {
+      "name": "sites-pending-offline",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 104,
+      "dpi": 96
+    },
+    {
+      "name": "sites-pending-running-desktop",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 112,
+      "dpi": 96
+    },
+    {
+      "name": "sites-pending-running-compact",
+      "Width": 946,
+      "Height": 679,
+      "sampledColors": 115,
+      "dpi": 96
+    },
+    {
+      "name": "import-dialog",
+      "Width": 620,
+      "Height": 260,
+      "sampledColors": 45,
+      "dpi": 96
+    },
+    {
+      "name": "app-rule-dialog",
+      "Width": 620,
+      "Height": 270,
+      "sampledColors": 68,
+      "dpi": 96
+    },
+    {
+      "name": "connection-empty",
+      "Width": 1044,
+      "Height": 788,
+      "sampledColors": 127,
+      "dpi": 96
+    }
+  ]
+}
