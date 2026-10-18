@@ -62,6 +62,17 @@ internal static class Capture
                 window.ShowPage("Приложения"); var apps = Descendants(window).OfType<DataGridView>().Single(); apps.Rows[0].Cells[3].Value = false;
                 if (reopened.Settings.Apps[0].IncludeFolder) throw new Exception("Native executable folder edit failed");
                 apps.Rows[0].Cells[3].Value = true;
+                foreach (var pair in new[] { ("Приложения", "apps"), ("Сайты", "sites") })
+                {
+                    window.ShowPage(pair.Item1); window.CapturePendingState(false);
+                    if (!Descendants(window).OfType<Label>().Any(l => l.Visible && l.Text.Contains("при следующем подключении"))) throw new Exception("Offline pending guidance missing");
+                    Snap(window, pair.Item2 + "-pending-offline");
+                    window.CapturePendingState(true);
+                    if (!Descendants(window).OfType<Button>().Any(b => b.Visible && b.Enabled && b.Text == "Применить маршруты")) throw new Exception("Running pending reconnect action missing");
+                    window.ClientSize = new Size(1100, 780); Snap(window, pair.Item2 + "-pending-running-desktop");
+                    window.ClientSize = new Size(930, 640); Snap(window, pair.Item2 + "-pending-running-compact");
+                    window.CapturePendingState(false);
+                }
                 window.ShowPage("Подключение"); window.ClientSize = new Size(1100, 780);
                 using var modalTimer = new System.Windows.Forms.Timer { Interval = 150 };
                 modalTimer.Tick += (_, _) =>
@@ -81,8 +92,8 @@ internal static class Capture
             File.WriteAllText(Path.Combine(output, "native-capture.json"), JsonSerializer.Serialize(new
             {
                 os = RuntimeInformation.OSDescription, runtime = RuntimeInformation.FrameworkDescription,
-                method = "Native Windows Forms DrawToBitmap on standard GitHub Windows runner; synthetic fixtures; no VPN started",
-                dpapiReload = "passed", protectedSessionAcl = "passed", ownedChildValidationAndCleanup = "passed", executableShortcut = "passed", nativeRuleEditing = "passed", maskedImportDialog = "passed", captures
+                method = "Native Windows Forms DrawToBitmap on standard GitHub Windows runner; synthetic fixtures; running-pending UI fixtures explicitly simulated; no VPN started",
+                dpapiReload = "passed", protectedSessionAcl = "passed", ownedChildValidationAndCleanup = "passed", executableShortcut = "passed", nativeRuleEditing = "passed", maskedImportDialog = "passed", pendingGuidance = "passed offline and simulated connected UI, no real TUN", captures
             }, new JsonSerializerOptions { WriteIndented = true }));
             Console.WriteLine("PASS native Windows Forms capture and isolated DPAPI round trip"); return 0;
         }

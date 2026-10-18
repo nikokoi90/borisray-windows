@@ -21,7 +21,7 @@ internal sealed class MainWindow : Form
     private readonly List<Button> navigation = [];
     private readonly HashSet<Task> operations = [];
     private readonly Dictionary<Control, int> preferredWidths = [];
-    private bool adapting;
+    private bool adapting, captureConnected;
     private string page = "Подключение";
     private bool busy, refreshing, dirty, closing, closed;
     private Label? statusLabel, pendingLabel, trafficLabel, speedLabel, connectionsStatus;
@@ -35,7 +35,7 @@ internal sealed class MainWindow : Form
     {
         store = isolatedStore ?? new PrivateStore();
         this.captureOnly = captureOnly;
-        Text = captureOnly ? "BorisRay — тестовые данные · VPN отключён" : "BorisRay"; ClientSize = new Size(1100, 780); MinimumSize = new Size(930, 640);
+        Text = captureOnly ? "BorisRay — тестовые данные · без сети" : "BorisRay"; ClientSize = new Size(1100, 780); MinimumSize = new Size(930, 640);
         BackColor = Ground; ForeColor = TextColor; Font = new Font("Segoe UI", 10); AutoScaleDimensions = new SizeF(96, 96); AutoScaleMode = AutoScaleMode.Dpi;
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath); StartPosition = FormStartPosition.CenterScreen;
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BorisRay.Icon.png")!;
@@ -225,10 +225,23 @@ internal sealed class MainWindow : Form
         grid.DataError += (_, e) => { e.ThrowException = false; };
         return grid;
     }
+    private void PendingRoutes(FlowLayoutPanel panel)
+    {
+        pendingLabel = Label("", secondary: true); panel.Controls.Add(pendingLabel);
+        apply = Button("Применить маршруты", () => _ = RunAsync(async () => { await engine.StopAsync(); await StartAsync(); })); panel.Controls.Add(apply);
+    }
+    internal void CapturePendingState(bool connected)
+    {
+        if (!captureOnly) throw new InvalidOperationException("Only available to isolated capture tests");
+        captureConnected = connected; dirty = true;
+        Text = connected ? "BorisRay — тест: активный VPN · без сетевого подключения" : "BorisRay — тестовые данные · без сети";
+        UpdateState();
+    }
     private void AppsPage()
     {
         var panel = Screen("Приложения"); panel.Controls.Add(Label("Выбери маршрут для программы. Сайты имеют приоритет; остальные приложения используют общий маршрут.", secondary: true));
         panel.Controls.Add(Row(Button("Добавить приложение…", AddApplication, true), Button("Из запущенных…", PickRunningApplication)));
+        PendingRoutes(panel);
         var grid = Grid("Приложение", "Путь", "Маршрут", "Папка"); grid.Height = 300; grid.Columns[0].ReadOnly = grid.Columns[1].ReadOnly = true;
         grid.Columns.RemoveAt(3); grid.Columns.Insert(3, new DataGridViewCheckBoxColumn { HeaderText = "Подпапки", Name = "Папка", FlatStyle = FlatStyle.Flat, FillWeight = 55 });
         grid.Columns.RemoveAt(2); grid.Columns.Insert(2, new DataGridViewComboBoxColumn { HeaderText = "Маршрут", Name = "Маршрут", DataSource = new[] { "Через VPN", "Напрямую" }, FlatStyle = FlatStyle.Flat, FillWeight = 85 });
@@ -288,6 +301,7 @@ internal sealed class MainWindow : Form
         var input = new TextBox { Width = 300, BackColor = Input, ForeColor = TextColor, PlaceholderText = "Домен или ссылка на сайт", AccessibleName = "Домен или ссылка на сайт", Margin = new Padding(0, 4, 12, 8) };
         var vpn = false; var route = Combo(["Напрямую", "Через VPN"], "Напрямую", value => vpn = value == "Через VPN", 150);
         var add = Button("Добавить", () => { try { var domain = input.Text.Trim(); if (Uri.TryCreate(domain, UriKind.Absolute, out var uri) && uri.Scheme is "https" or "http") domain = uri.IdnHost; store.Settings.Sites[Profiles.Domain(domain)] = vpn; Changed(); ShowPage("Сайты"); } catch (ArgumentException e) { ShowError(e.Message); } }, true); add.Enabled = false; input.TextChanged += (_, _) => add.Enabled = !string.IsNullOrWhiteSpace(input.Text); panel.Controls.Add(Row(input, route, add));
+        PendingRoutes(panel);
         var grid = Grid("Домен", "Маршрут"); grid.Height = 300; grid.Columns[0].ReadOnly = true;
         grid.Columns.RemoveAt(1); grid.Columns.Add(new DataGridViewComboBoxColumn { HeaderText = "Маршрут", Name = "Маршрут", DataSource = new[] { "Напрямую", "Через VPN" }, FlatStyle = FlatStyle.Flat });
         foreach (var rule in store.Settings.Sites.OrderBy(x => x.Key)) { var i = grid.Rows.Add(rule.Key, rule.Value ? "Через VPN" : "Напрямую"); grid.Rows[i].Tag = rule.Key; }
@@ -372,7 +386,7 @@ internal sealed class MainWindow : Form
     {
         if (closing || IsDisposed) return;
         content.Enabled = !busy;
-        var running = engine.Running; state.Text = busy ? "Выполняю действие…" : running ? "VPN запущен" : "VPN выключен"; state.ForeColor = running ? Gold : Secondary;
+        var running = engine.Running || (captureOnly && captureConnected); state.Text = busy ? "Выполняю действие…" : running ? "VPN запущен" : "VPN выключен"; state.ForeColor = running ? Gold : Secondary;
         if (statusLabel != null) statusLabel.Text = state.Text;
         if (connect != null) { connect.Text = running ? "Отключить VPN" : "Подключить VPN"; connect.Enabled = !busy && (running || Configuration.Selected(store.Nodes, store.Settings).Count > 0); }
         if (apply != null) { apply.Visible = running && dirty; apply.Enabled = !busy; }
