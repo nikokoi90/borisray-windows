@@ -79,7 +79,11 @@ internal static class Capture
                 {
                     modalTimer.Stop(); var modal = Application.OpenForms.Cast<Form>().Single(f => f.Text == "Импорт подписки");
                     var input = Descendants(modal).OfType<TextBox>().Single(); if (!input.UseSystemPasswordChar) throw new Exception("Subscription input is not masked");
-                    input.Text = "https://provider.example/subscription/synthetic"; Snap(modal, "import-dialog"); modal.Close();
+                    input.Text = "https://provider.example/subscription/synthetic"; Snap(modal, "import-dialog");
+                    const string unsupported = "vless://00000000-0000-4000-8000-000000000001@entry.example:443?security=tls&type=xhttp#Synthetic";
+                    input.Text = unsupported; Descendants(modal).OfType<Button>().Single(b => b.Text == "Добавить").PerformClick();
+                    if (input.Text != unsupported || !input.Enabled || reopened.Profile?.Raw != raw || !Descendants(modal).OfType<Label>().Any(l => l.Text.Contains("XHTTP"))) throw new Exception("Import failure did not preserve input/profile with a specific explanation");
+                    Snap(modal, "import-error"); modal.Close();
                 };
                 modalTimer.Start(); Descendants(window).OfType<Button>().Single(b => b.Text == "Заменить подписку…").PerformClick();
                 using var ruleTimer = new System.Windows.Forms.Timer { Interval = 150 };

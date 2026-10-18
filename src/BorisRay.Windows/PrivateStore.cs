@@ -6,7 +6,7 @@ using BorisRay.Core;
 
 namespace BorisRay.Windows;
 
-internal sealed record DeviceProfile(string Raw, string Source);
+internal sealed record DeviceProfile(string Raw, string Source, string Format = "Подписка");
 
 internal sealed class PrivateStore
 {

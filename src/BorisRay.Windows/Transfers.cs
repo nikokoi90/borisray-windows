@@ -14,8 +14,8 @@ internal static class Transfers
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(token); timeout.CancelAfter(TimeSpan.FromSeconds(25)); token = timeout.Token;
         var uri = Profiles.SubscriptionUri(input);
         using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(25) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("BorisRay-Windows/0.1.0");
-        client.DefaultRequestHeaders.Accept.ParseAdd("text/plain");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("sing-box/1.14.3 BorisRay/0.2.0");
+        client.DefaultRequestHeaders.Accept.ParseAdd("text/plain, application/json, application/yaml, text/yaml, */*");
         for (var redirects = 0; redirects <= 3; redirects++)
         {
             using var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token);
@@ -81,10 +81,10 @@ internal static class Transfers
         using var response = await client.GetAsync(UpdatesBase + "latest.json", HttpCompletionOption.ResponseHeadersRead, timeout.Token); response.EnsureSuccessStatusCode();
         var data = await ReadBoundedAsync(response.Content, 16_384, timeout.Token);
         var manifest = JsonNode.Parse(data) as JsonObject ?? throw new InvalidOperationException("Некорректный ответ сервера обновлений.");
-        if (!Version.TryParse(manifest["version"]?.GetValue<string>(), out var version) || !Uri.TryCreate(manifest["url"]?.GetValue<string>(), UriKind.Absolute, out var url))
+        if (!Version.TryParse(manifest["version"]?.GetValue<string>(), out var version) || !Uri.TryCreate((manifest["installer_url"] ?? manifest["url"])?.GetValue<string>(), UriKind.Absolute, out var url))
             throw new InvalidOperationException("Некорректный ответ сервера обновлений.");
         if (manifest["platform"]?.GetValue<string>() != "win-x64" || url.Scheme != "https" || url.Host != "fv1.borishub.com" || !url.IsDefaultPort || url.UserInfo.Length > 0 || url.Query.Length > 0 || url.Fragment.Length > 0 ||
-            !System.Text.RegularExpressions.Regex.IsMatch(url.AbsolutePath, @"^/downloads/borisray/windows/BorisRay-Windows-x64-[0-9.]+\.zip$"))
+            !System.Text.RegularExpressions.Regex.IsMatch(url.AbsolutePath, @"^/downloads/borisray/windows/BorisRay-Windows-(?:x64-[0-9.]+\.zip|Setup-x64-[0-9.]+\.exe)$"))
             throw new InvalidOperationException("Некорректный ответ сервера обновлений.");
         return (version, url);
     }

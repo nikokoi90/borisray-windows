@@ -11,12 +11,15 @@ Cronet Go wrapper notice: licenses/cronet-LICENSE (matching upstream module).
 Chromium notice: licenses/chromium-LICENSE.txt; full upstream third-party sources and notices: https://chromium.googlesource.com/chromium/src/+/refs/heads/main/third_party/.
 Conservative upstream Go module notice collection: licenses/Go-dependencies.txt.
 
+YamlDotNet 16.3.0: MIT, Antoine Aubry and contributors; licenses/YamlDotNet-LICENSE.txt.
+Source: https://github.com/aaubry/YamlDotNet/tree/v16.3.0
+
 .NET runtime and Windows Forms: MIT, Microsoft and contributors.
 Full runtime and Windows Forms licenses/notices are in licenses/.
 
 Original BorisRay golden manta: approved project asset; provenance and generation prompt in assets/PROVENANCE.md in the source archive.
 
 Complete client source, build script and corresponding upstream core source:
-https://fv1.borishub.com/downloads/borisray/windows/BorisRay-Windows-0.1.0-source.zip
+https://fv1.borishub.com/downloads/borisray/windows/BorisRay-Windows-0.2.0-source.zip
 Client repository: https://github.com/nikokoi90/borisray-windows
 Source is provided alongside this release; no private subscription or signing key is included.

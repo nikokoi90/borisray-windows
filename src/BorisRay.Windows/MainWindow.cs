@@ -48,7 +48,7 @@ internal sealed class MainWindow : Form
         var nav = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(0, 12, 0, 0) };
         foreach (var name in new[] { "Подключение", "Приложения", "Сайты", "Соединения", "О приложении" })
         { var button = Button(name, () => ShowPage(name)); button.Width = 198; button.Height = 44; button.TextAlign = ContentAlignment.MiddleLeft; ((ActionButton)button).Borderless = true; navigation.Add(button); nav.Controls.Add(button); }
-        var footer = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 78, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(2, 8, 0, 0) }; footer.Controls.Add(state); footer.Controls.Add(new Label { Text = "0.1.0 · Бесплатный клиент", AutoSize = true, ForeColor = Secondary, Font = new Font("Segoe UI", 9), Margin = new Padding(0, 8, 0, 0) });
+        var footer = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 78, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(2, 8, 0, 0) }; footer.Controls.Add(state); footer.Controls.Add(new Label { Text = "0.2.0 · Бесплатный клиент", AutoSize = true, ForeColor = Secondary, Font = new Font("Segoe UI", 9), Margin = new Padding(0, 8, 0, 0) });
         sidebar.Controls.Add(nav); sidebar.Controls.Add(brand); sidebar.Controls.Add(footer);
         var center = new Panel { Dock = DockStyle.Fill }; center.Controls.Add(content); center.Controls.Add(banner);
         Controls.Add(center); Controls.Add(sidebar);
@@ -164,12 +164,13 @@ internal sealed class MainWindow : Form
         import = Button(store.Nodes.Count == 0 ? "Добавить по ссылке…" : "Заменить подписку…", ImportProfile, store.Nodes.Count == 0);
         refresh = Button("Обновить", () => _ = RunAsync(RefreshProfileAsync));
         panel.Controls.Add(Row(import, Button("Из файла…", ImportFile), refresh));
-        if (store.Nodes.Count == 0) panel.Controls.Add(Label("Ссылка от твоего VPN-провайдера, VLESS Reality или Hysteria2. Клиент бесплатный; серверы и подписку выбираешь сам.", secondary: true));
+        if (store.Nodes.Count == 0) panel.Controls.Add(Label("Вставь HTTPS-ссылку своего VPN-провайдера — серверы появятся автоматически. Подписку и серверы выбираешь сам; клиент бесплатный.", secondary: true));
+        if (store.Nodes.Count > 0) panel.Controls.Add(Label($"{store.Profile?.Format ?? "Подписка"} · {string.Join(", ", store.Nodes.Select(n => n.Outbound["type"]!.GetValue<string>()).Distinct())}", secondary: true));
         var countries = new Dictionary<string, string> { ["auto"] = "Все страны" };
         foreach (var code in store.Nodes.Select(n => n.Country).Where(c => c != "auto").Distinct().OrderBy(Profiles.CountryName)) countries[code] = Profiles.CountryName(code);
         var countryValues = countries.Values.ToList();
         var country = Combo(countryValues, countries.GetValueOrDefault(store.Settings.Country, "Все страны"), value => { store.Settings.Country = countries.First(x => x.Value == value).Key; store.Settings.Server = "auto"; Changed(); ShowPage(page); }, 270);
-        var channel = Combo(["Авто · TCP + UDP", "TCP · VLESS Reality", "UDP · Hysteria2"], store.Settings.Channel switch { "tcp" => "TCP · VLESS Reality", "udp" => "UDP · Hysteria2", _ => "Авто · TCP + UDP" }, value => { store.Settings.Channel = value.StartsWith("TCP", StringComparison.Ordinal) ? "tcp" : value.StartsWith("UDP", StringComparison.Ordinal) ? "udp" : "all"; store.Settings.Server = "auto"; Changed(); ShowPage(page); }, 270);
+        var channel = Combo(["Авто · TCP + UDP", "TCP", "UDP"], store.Settings.Channel switch { "tcp" => "TCP", "udp" => "UDP", _ => "Авто · TCP + UDP" }, value => { store.Settings.Channel = value.StartsWith("TCP", StringComparison.Ordinal) ? "tcp" : value.StartsWith("UDP", StringComparison.Ordinal) ? "udp" : "all"; store.Settings.Server = "auto"; Changed(); ShowPage(page); }, 270);
         panel.Controls.Add(Row(Field("Страна", country), Field("Канал", channel)));
         var nodes = Configuration.Selected(store.Nodes, store.Settings);
         if (store.Nodes.Count > 0 && nodes.Count == 0) panel.Controls.Add(Label("В этой стране нет профиля выбранного канала. Выбери другой канал или «Все страны».", secondary: true));
@@ -185,7 +186,7 @@ internal sealed class MainWindow : Form
     }
     private void ImportFile()
     {
-        using var picker = new OpenFileDialog { Title = "Список профилей", Filter = "Текстовые подписки|*.txt;*.conf|Все файлы|*.*", CheckFileExists = true };
+        using var picker = new OpenFileDialog { Title = "Подписка или список серверов", Filter = "Подписки и профили|*.txt;*.conf;*.json;*.yaml;*.yml|Все файлы|*.*", CheckFileExists = true };
         if (picker.ShowDialog(this) != DialogResult.OK) return;
         _ = RunAsync(async () => { if (new FileInfo(picker.FileName).Length > Profiles.MaximumBytes) throw new ArgumentException("Файл больше 1 МиБ."); await ImportAsync(await File.ReadAllTextAsync(picker.FileName)); ShowPage("Подключение"); });
     }
@@ -200,20 +201,33 @@ internal sealed class MainWindow : Form
     { if (string.IsNullOrWhiteSpace(store.Profile?.Source)) throw new ArgumentException("Добавь HTTPS-ссылку подписки для обновления."); await ImportAsync(store.Profile.Source); }
     private void ImportProfile()
     {
-        using var dialog = new Form { Text = "Импорт подписки", Size = new Size(620, 260), StartPosition = FormStartPosition.CenterParent, BackColor = Ground, ForeColor = TextColor, Font = Font, MinimizeBox = false, MaximizeBox = false };
-        var explanation = Label("HTTPS-ссылка от твоего провайдера или один VLESS Reality / Hysteria2-профиль. Новая подписка заменит текущую; правила сохранятся."); explanation.MaximumSize = new Size(dialog.ClientSize.Width - 16, 0); explanation.Dock = DockStyle.Top; explanation.Padding = new Padding(16);
+        using var dialog = new Form { Text = "Импорт подписки", Size = new Size(660, 390), StartPosition = FormStartPosition.CenterParent, BackColor = Ground, ForeColor = TextColor, Font = Font, MinimizeBox = false, MaximizeBox = false };
+        var explanation = Label("Вставь HTTPS-ссылку подписки или ссылку сервера. Поддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC и SOCKS5, включая списки Base64, Xray/sing-box JSON и Clash YAML. Новая подписка заменит текущую; правила сохранятся."); explanation.MaximumSize = new Size(dialog.ClientSize.Width - 16, 0); explanation.Dock = DockStyle.Top; explanation.Padding = new Padding(16);
         var input = new TextBox { Dock = DockStyle.Top, UseSystemPasswordChar = true, MaxLength = Profiles.MaximumBytes, BackColor = Input, ForeColor = TextColor, AccessibleName = "Приватная ссылка подписки" };
         var show = new CheckBox { Text = "Показать ссылку", Dock = DockStyle.Top, AutoSize = true, Padding = new Padding(16, 8, 0, 8) }; show.CheckedChanged += (_, _) => input.UseSystemPasswordChar = !show.Checked;
-        var buttons = Row(Button("Добавить", () => { dialog.DialogResult = DialogResult.OK; dialog.Close(); }, true), Button("Отмена", () => dialog.Close())); buttons.Dock = DockStyle.Bottom;
-        dialog.Controls.Add(show); dialog.Controls.Add(input); dialog.Controls.Add(explanation); dialog.Controls.Add(buttons); dialog.AcceptButton = (IButtonControl)buttons.Controls[0]; dialog.CancelButton = (IButtonControl)buttons.Controls[1];
-        if (dialog.ShowDialog(this) == DialogResult.OK) { var value = input.Text; _ = RunAsync(async () => { await ImportAsync(value); ShowPage("Подключение"); }); }
+        var feedback = Label("Зашифрованные happ://crypto и XHTTP пока не поддерживаются.", secondary: true); feedback.Dock = DockStyle.Fill; feedback.Padding = new Padding(16, 12, 16, 0); feedback.MaximumSize = new Size(0, 0); feedback.AutoSize = false;
+        var loading = false;
+        var add = Button("Добавить", () => { }, true); var cancel = Button("Отмена", () => dialog.Close());
+        var buttons = Row(add, cancel); buttons.Dock = DockStyle.Bottom;
+        add.Click += async (_, _) =>
+        {
+            if (loading || busy) return;
+            loading = true; add.Enabled = cancel.Enabled = input.Enabled = show.Enabled = false; feedback.ForeColor = Secondary; feedback.Text = "Загружаю подписку и проверяю серверы…";
+            try { await ImportAsync(input.Text); dialog.DialogResult = DialogResult.OK; dialog.Close(); }
+            catch (Exception e) when (e is ArgumentException or InvalidOperationException or OperationCanceledException or HttpRequestException or System.ComponentModel.Win32Exception or IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+            { feedback.ForeColor = Color.FromArgb(255, 158, 158); feedback.Text = e is OperationCanceledException ? "Сервер не ответил вовремя. Повтори импорт." : e is HttpRequestException ? "Не удалось загрузить подписку. Проверь интернет и ссылку." : e.Message; }
+            finally { loading = false; if (!dialog.IsDisposed) { add.Enabled = cancel.Enabled = input.Enabled = show.Enabled = true; input.Focus(); } }
+        };
+        dialog.FormClosing += (_, e) => { if (loading && dialog.DialogResult != DialogResult.OK) e.Cancel = true; };
+        dialog.Controls.Add(feedback); dialog.Controls.Add(show); dialog.Controls.Add(input); dialog.Controls.Add(explanation); dialog.Controls.Add(buttons); dialog.AcceptButton = add; dialog.CancelButton = cancel;
+        if (dialog.ShowDialog(this) == DialogResult.OK) ShowPage("Подключение");
     }
     private async Task ImportAsync(string input)
     {
-        var raw = await Transfers.FetchSubscriptionAsync(input); var nodes = Profiles.Parse(raw);
+        input = SubscriptionParser.Input(input); var raw = await Transfers.FetchSubscriptionAsync(input); var parsed = SubscriptionParser.Parse(raw); var nodes = parsed.Nodes;
         var settings = new RoutingSettings { Channel = nodes.Any(n => n.Channel == store.Settings.Channel) ? store.Settings.Channel : "all", Sites = store.Settings.Sites, Apps = store.Settings.Apps, DefaultVpn = store.Settings.DefaultVpn };
         await engine.ValidateAsync(nodes, settings);
-        store.SaveProfile(new DeviceProfile(raw, input.TrimStart().StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? Profiles.SubscriptionUri(input).AbsoluteUri : ""), nodes); dirty = true;
+        store.SaveProfile(new DeviceProfile(raw, input.TrimStart().StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? Profiles.SubscriptionUri(input).AbsoluteUri : "", parsed.Format), nodes); dirty = true;
     }
     private DataGridView Grid(params string[] headings)
     {
@@ -342,14 +356,14 @@ internal sealed class MainWindow : Form
     }
     private void AboutPage()
     {
-        var panel = Screen("О приложении"); panel.Controls.Add(Label("BorisRay 0.1.0 · Windows x64", 16, true));
+        var panel = Screen("О приложении"); panel.Controls.Add(Label("BorisRay 0.2.0 · Windows x64", 16, true));
         panel.Controls.Add(Label("Бесплатный клиент для твоих VPN-подписок", 14, true));
-        panel.Controls.Add(Label("Подключай своих провайдеров: HTTPS-подписки, списки ссылок и текстовые файлы с VLESS Reality / Hysteria2. Другие протоколы, JSON и Clash YAML пока не поддерживаются.", secondary: true));
+        panel.Controls.Add(Label("Свои HTTPS-подписки, списки ссылок и Base64, Xray/sing-box JSON и Clash YAML. Протоколы: VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC и SOCKS5. Для VLESS/VMess/Trojan: TCP, WebSocket, gRPC, HTTP/HTTPUpgrade. XHTTP, зашифрованные ссылки Happ и внешние плагины пока не поддерживаются.", secondary: true));
         panel.Controls.Add(Label("Подписка хранится на этом компьютере и шифруется средствами Windows. Клиент не содержит готовых доступов к VPN-сервису.", secondary: true));
         panel.Controls.Add(Label("Обновления BorisRay", 14, true));
         var updateStatus = Label("Проверка доступна вручную. Новая версия устанавливается распаковкой архива после закрытия приложения.", secondary: true); panel.Controls.Add(updateStatus);
-        panel.Controls.Add(Button("Проверить обновления", () => _ = RunAsync(async () => { var update = await Transfers.UpdateAsync(); if (update.Version <= new Version(0, 1, 0)) updateStatus.Text = "Установлена последняя версия"; else { updateStatus.Text = "Доступна версия " + update.Version; panel.Controls.Add(Button("Скачать обновление", () => OpenUrl(update.Download.AbsoluteUri), true)); } })));
-        panel.Controls.Add(Button("Исходники BorisRay", () => OpenUrl(Transfers.UpdatesBase + "BorisRay-Windows-0.1.0-source.zip")));
+        panel.Controls.Add(Button("Проверить обновления", () => _ = RunAsync(async () => { var update = await Transfers.UpdateAsync(); if (update.Version <= new Version(0, 2, 0)) updateStatus.Text = "Установлена последняя версия"; else { updateStatus.Text = "Доступна версия " + update.Version; panel.Controls.Add(Button("Скачать обновление", () => OpenUrl(update.Download.AbsoluteUri), true)); } })));
+        panel.Controls.Add(Button("Исходники BorisRay", () => OpenUrl(Transfers.UpdatesBase + "BorisRay-Windows-0.2.0-source.zip")));
         panel.Controls.Add(Button("Лицензии и авторы", () => OpenFile(Path.Combine(AppContext.BaseDirectory, "LICENSES.txt"))));
         panel.Controls.Add(Button("Сохранить диагностику…", SaveDiagnostics));
         panel.Controls.Add(Label("Ядро sing-box 1.14.3, © nekohasekai и участники SagerNet, GPLv3+. Независимый клиент, без связи с авторами исходного проекта. Подпись издателя Windows для этой сборки не выпускалась.", secondary: true));
@@ -359,7 +373,7 @@ internal sealed class MainWindow : Form
     private void SaveDiagnostics()
     {
         using var picker = new SaveFileDialog { FileName = "BorisRay-diagnostics.txt", Filter = "Текст|*.txt" }; if (picker.ShowDialog(this) != DialogResult.OK) return;
-        File.WriteAllText(picker.FileName, $"BorisRay-Windows0.1.0\r\nCore1.14.3\r\nRunning={engine.Running}\r\nProfiles={store.Nodes.Count}\r\nPhysicalIPv6={WindowsPlatform.HasPhysicalIPv6()}\r\n{engine.Journal()}");
+        File.WriteAllText(picker.FileName, $"BorisRay-Windows0.2.0\r\nCore1.14.3\r\nRunning={engine.Running}\r\nProfiles={store.Nodes.Count}\r\nPhysicalIPv6={WindowsPlatform.HasPhysicalIPv6()}\r\n{engine.Journal()}");
     }
     private void Measure()
     {

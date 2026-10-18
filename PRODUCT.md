@@ -20,7 +20,7 @@ Import a user-provided VPN subscription, connect and choose application/website 
 
 ## Capabilities and Constraints
 
-Real connect/disconnect, TCP VLESS Reality and UDP Hysteria2, country/server selection from explicit subscription labels, application and domain rules, connection monitoring, bounded speed/upload/HTTPS latency. Website rules precede application rules. An application shortcut must resolve to its actual executable. Device credentials stay private and outside distributable files. No family administration or bundled provider credential. No provider-specific default routes. Existing Mac VPN and server routes must remain untouched. The Windows tunnel needs administrator consent; compilation/config checks are distinct from Windows kernel routing acceptance.
+Real connect/disconnect, VLESS TCP/TLS/Reality, VMess, Trojan, Shadowsocks AEAD/2022, Hysteria2, TUIC and SOCKS5; HTTPS, plain/Base64, Xray/sing-box JSON and Clash YAML server import; standard Windows installer, country/server selection from explicit subscription labels, application and domain rules, connection monitoring, bounded speed/upload/HTTPS latency. Website rules precede application rules. An application shortcut must resolve to its actual executable. Device credentials stay private and outside distributable files. No family administration or bundled provider credential. No provider-specific default routes. Existing Mac VPN and server routes must remain untouched. The Windows tunnel needs administrator consent; compilation/config checks are distinct from Windows kernel routing acceptance.
 
 ## Brand Commitments
 

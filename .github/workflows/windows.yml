@@ -2,7 +2,7 @@ name: Windows build and native checks
 on:
   push:
     branches: [main, 'codex/**']
-    paths: ['src/**', 'tests/**', 'assets/**', 'licenses/**', 'Scripts/build.ps1', '.github/workflows/**', 'README.txt', 'LICENSE', 'LICENSES.txt']
+    paths: ['src/**', 'tests/**', 'assets/**', 'licenses/**', 'Scripts/**', '.github/workflows/**', 'README.txt', 'LICENSE', 'LICENSES.txt']
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,6 +29,8 @@ jobs:
           name: BorisRay-Windows-x64
           path: |
             artifacts/BorisRay-Windows-x64-*.zip
+            artifacts/BorisRay-Windows-Setup-x64-*.exe
+            artifacts/installer-check.json
             artifacts/SHA256SUMS
             artifacts/build.json
             artifacts/review/

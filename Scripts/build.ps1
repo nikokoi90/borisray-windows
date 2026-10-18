@@ -5,7 +5,7 @@ $env:DOTNET_GENERATE_ASPNET_CERTIFICATE = 'false'
 $root = Split-Path $PSScriptRoot -Parent
 Set-Location $root
 function Check-Exit { if ($LASTEXITCODE -ne 0) { throw "Command failed with exit code $LASTEXITCODE" } }
-$version = '0.1.0'
+$version = '0.2.0'
 $coreVersion = '1.14.3'
 $zipHash = 'd8b86ef58936dba9230ec6a57ffa4243933f3c14ef4809828b6c553440ed1518'
 $exeHash = '5c19bb3f8c12d4e85b3d47fe63123a7624b314b58dd7a8e32f51004f1c4d2faf'
@@ -43,6 +43,12 @@ if ($Capture) {
     Copy-Item "$vendor/*" 'artifacts/capture/core' -Recurse -Force
     & './artifacts/capture/BorisRay.Capture.exe' (Join-Path $root 'artifacts/review'); Check-Exit
 }
+$compiler = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6/ISCC.exe'
+if (-not (Test-Path $compiler)) { throw 'Inno Setup 6 is required to produce the installer' }
+& $compiler "/DAppVersion=$version" 'Scripts/installer.iss'; Check-Exit
+$setup = "artifacts/BorisRay-Windows-Setup-x64-$version.exe"
+if ($Capture) { & './Scripts/check_installer.ps1' -Setup $setup; if (-not $?) { throw 'Installer verification failed' } }
+$setupHash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLowerInvariant()
 $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-"$hash  $(Split-Path $archive -Leaf)" | Set-Content 'artifacts/SHA256SUMS' -Encoding utf8NoBOM
-@{ version = $version; platform = 'win-x64'; core = $coreVersion; sha256 = $hash; size = (Get-Item $archive).Length; commit = $env:GITHUB_SHA; os = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription } | ConvertTo-Json | Set-Content 'artifacts/build.json' -Encoding utf8NoBOM
+"$hash  $(Split-Path $archive -Leaf)`n$setupHash  $(Split-Path $setup -Leaf)" | Set-Content 'artifacts/SHA256SUMS' -Encoding utf8NoBOM
+@{ version = $version; platform = 'win-x64'; core = $coreVersion; sha256 = $hash; size = (Get-Item $archive).Length; installer = (Split-Path $setup -Leaf); installerSha256 = $setupHash; installerSize = (Get-Item $setup).Length; commit = $env:GITHUB_SHA; os = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription } | ConvertTo-Json | Set-Content 'artifacts/build.json' -Encoding utf8NoBOM

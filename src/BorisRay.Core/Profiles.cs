@@ -70,67 +70,14 @@ public static class Profiles
         return result;
     }
 
-    private static string Decode(string s) => Uri.UnescapeDataString(s);
+    public static List<Node> Parse(string input) => SubscriptionParser.Parse(input).Nodes;
 
-    public static List<Node> Parse(string input)
+    internal static Node Named(JsonObject outbound, string label, int index)
     {
-        if (Encoding.UTF8.GetByteCount(input) > MaximumBytes) throw new ArgumentException("Подписка слишком большая.");
-        var raw = input.Trim();
-        if (!raw.Contains("://", StringComparison.Ordinal))
-        {
-            try { raw = Encoding.UTF8.GetString(Convert.FromBase64String(raw)); }
-            catch (FormatException) { throw new ArgumentException("Нужен список VLESS Reality / Hysteria2 или HTTPS-подписка."); }
-        }
-        var lines = raw.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (lines.Length is < 1 or > 256) throw new ArgumentException("В подписке должно быть от 1 до 256 профилей.");
-        var result = new List<Node>();
-        for (var i = 0; i < lines.Length; i++)
-        {
-            try { result.Add(ParseNode(lines[i], i)); }
-            catch (Exception e) when (e is ArgumentException or FormatException or KeyNotFoundException or InvalidOperationException)
-            { throw new ArgumentException($"Не удалось разобрать профиль {i + 1}. Поддерживаются TCP VLESS Reality и UDP Hysteria2."); }
-        }
-        return result;
-    }
-
-    private static Node ParseNode(string line, int index)
-    {
-        var uri = new Uri(line, UriKind.Absolute);
-        if (uri.Scheme is not ("vless" or "hysteria2" or "hy2") || string.IsNullOrWhiteSpace(uri.Host) || uri.Port is < 1 or > 65535 || uri.UserInfo.Length == 0)
-            throw new ArgumentException("Unsupported profile");
-        var q = uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries)
-            .Select(p => p.Split('=', 2)).ToDictionary(p => Decode(p[0]), p => p.Length == 2 ? Decode(p[1]) : "", StringComparer.Ordinal);
-        string Get(string key, string fallback = "") => q.GetValueOrDefault(key, fallback);
-        if (Get("insecure") == "1" || Get("allowInsecure") == "1") throw new ArgumentException("Insecure TLS");
-        var name = uri.Fragment.Length > 1 ? Decode(uri.Fragment[1..]) : $"Сервер {index + 1}";
-        name = new string(name.Where(c => !char.IsControl(c)).Take(160).ToArray());
-        var country = CountryFromName(name);
-        var tls = new JsonObject { ["enabled"] = true, ["server_name"] = Get("sni", Get("peer", uri.Host)) };
-        var node = new JsonObject { ["tag"] = $"{name} · {index + 1}", ["server"] = uri.Host.Trim('[', ']'), ["server_port"] = uri.Port, ["tls"] = tls };
-        string channel;
-        if (uri.Scheme == "vless")
-        {
-            if (Get("type", "tcp") != "tcp" || Get("security") != "reality" || string.IsNullOrWhiteSpace(Get("pbk")) || !Guid.TryParseExact(Decode(uri.UserInfo), "D", out _)) throw new ArgumentException("Unsupported VLESS");
-            tls["utls"] = new JsonObject { ["enabled"] = true, ["fingerprint"] = Get("fp", "chrome") };
-            tls["reality"] = new JsonObject { ["enabled"] = true, ["public_key"] = Get("pbk"), ["short_id"] = Get("sid") };
-            node["type"] = "vless"; node["uuid"] = Decode(uri.UserInfo);
-            if (Get("flow").Length > 0) node["flow"] = Get("flow");
-            channel = "tcp";
-        }
-        else
-        {
-            node["type"] = "hysteria2"; node["password"] = Decode(uri.UserInfo); channel = "udp";
-            if (Get("obfs").Length > 0)
-            {
-                if (Get("obfs") != "salamander" || Get("obfs-password").Length == 0) throw new ArgumentException("Unsupported obfuscation");
-                node["obfs"] = new JsonObject { ["type"] = "salamander", ["password"] = Get("obfs-password") };
-            }
-            if (Get("mport").Length > 0)
-            {
-                if (!Regex.IsMatch(Get("mport"), "^[0-9,:-]+$")) throw new ArgumentException("Invalid ports");
-                node["server_ports"] = new JsonArray(Get("mport").Split(',').Select(p => (JsonNode?)JsonValue.Create(p.Replace('-', ':'))).ToArray());
-            }
-        }
-        return new Node(name, country, channel, node);
+        var name = new string(label.Where(c => !char.IsControl(c)).Take(160).ToArray()).Trim();
+        if (name.Length == 0) name = $"Сервер {index + 1}";
+        outbound["tag"] = $"{name} · {index + 1}";
+        var channel = outbound["type"]!.GetValue<string>() is "hysteria2" or "tuic" ? "udp" : "tcp";
+        return new Node(name, CountryFromName(name), channel, outbound);
     }
 }

@@ -17,7 +17,7 @@ Check(nodes.Count == 2 && nodes[0].Country == "pl" && nodes[1].Country == "fi", 
 Check(Profiles.Parse(Convert.ToBase64String(Encoding.UTF8.GetBytes(raw))).Count == 2, "base64 list imports atomically");
 Reject(() => Profiles.Parse(raw + "\nunsupported://secret"), "unsupported trailing node rejects whole import");
 Reject(() => Profiles.Parse(udp.Replace("sni=", "insecure=1&sni=")), "insecure TLS rejected");
-Reject(() => Profiles.Parse(tcp.Replace("type=tcp", "type=ws")), "unsupported VLESS transport rejected");
+Reject(() => Profiles.Parse(tcp.Replace("type=tcp", "type=xhttp")), "unsupported XHTTP transport rejected explicitly");
 Reject(() => Profiles.Parse("hysteria2://bad"), "missing host/port rejected");
 Reject(() => Profiles.Parse(new string('x', Profiles.MaximumBytes + 1)), "bounded subscription");
 Check(Profiles.SubscriptionUri("https://provider.example/j/synthetic-token").AbsolutePath == "/j/synthetic-token", "provider subscription URL is preserved");
@@ -60,4 +60,8 @@ for (var ipv6 = 0; ipv6 < 2; ipv6++)
     File.WriteAllText(Path.Combine(output, $"tun-{ipv6}.json"), Configuration.Build(nodes, settings, ipv6 == 1, 17991, "synthetic-api-secret").ToJsonString());
     File.WriteAllText(Path.Combine(output, $"probe-{ipv6}.json"), Configuration.Build(nodes, settings, ipv6 == 1, 17991, "synthetic-api-secret", 17992, "synthetic-proxy-password", true).ToJsonString());
 }
+var compatibility = SubscriptionChecks.Run(Check, Reject);
+var importedIndex = 0;
+foreach (var fixture in compatibility)
+    File.WriteAllText(Path.Combine(output, $"subscription-{importedIndex++}.json"), Configuration.Build(fixture, new RoutingSettings(), false, 17991, "synthetic-api-secret").ToJsonString());
 Console.WriteLine($"{passed} checks passed. Synthetic core configurations: {output}");
